@@ -28,32 +28,36 @@ const hItems = $("<div>").appendTo(h).css({
     overflowY: "scroll",
     maxHeight: "40vh",
 });
+const ids = [];
 function loadList(){
+    while(ids.length) clearTimeout(ids.pop());
     hItems.empty();
     g_list = inputURL().split('\n').filter(v=>v).map((url,i)=>{
         const r = judgeURL(url);
-        let elm;
-        if(!r) return console.error(`${url} is not video URL`);
-        else if(r[0] === YouTube) elm = $("<img>",{src:`https://i.ytimg.com/vi/${r[1]}/hqdefault.jpg`});
-        else if(r[0] === Nico) elm = $("<iframe>").attr({src:`https://ext.nicovideo.jp/thumb/sm${r[1]}`});
-        const h = $("<div>").appendTo(hItems).css({
-            position: "relative",
-            float: "left"
-        });
-        elm.appendTo(h).css({
-            maxHeight: 100,
-        });
-        h.css({
-            width: elm.width(),
-            height: elm.height()
-        });
-        $("<div>").appendTo(h).css({
-            position: "absolute",
-            top: 0,
-            left: 0,
-            bottom: 0,
-            right: 0
-        }).addClass("item");
+        ids.push(setTimeout(()=>{
+            let elm;
+            if(!r) return console.error(`${url} is not video URL`);
+            else if(r[0] === YouTube) elm = $("<img>",{src:`https://i.ytimg.com/vi/${r[1]}/hqdefault.jpg`});
+            else if(r[0] === Nico) elm = $("<iframe>").attr({src:`https://ext.nicovideo.jp/thumb/sm${r[1]}`});
+            const h = $("<div>").appendTo(hItems).css({
+                position: "relative",
+                float: "left"
+            });
+            elm.appendTo(h).css({
+                maxHeight: 100,
+            });
+            h.css({
+                width: elm.width(),
+                height: elm.height()
+            });
+            $("<div>").appendTo(h).css({
+                position: "absolute",
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0
+            }).addClass("item");
+        },500*i));
         return r;
     }).filter(v=>v);
     $(".item").each((i,e)=>$(e).on("click",()=>jump(i)));
