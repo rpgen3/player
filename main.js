@@ -61,8 +61,8 @@ function loadList(){
         return r;
     }).filter(v=>v);
     $(".item").each((i,e)=>$(e).on("click",()=>jump(i)));
-    jump(0);
     unplayed = prevIdx = null;
+    setTimeout(()=>jump(0),1000);
 }
 function judgeURL(url){
     if(!url) return console.error("url is empty");
@@ -98,6 +98,7 @@ background-color:rgba(127, 127, 0, 0.3);
 let prevIdx = null;
 function setActive(i){
     if(null !== prevIdx) $(".item").eq(prevIdx).removeClass("active");
+    prevIdx = i;
     $(".item").eq(i).addClass("active");
 }
 h.append("<br>");
