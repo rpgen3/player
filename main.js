@@ -132,6 +132,7 @@ const hIframe = $("<div>").appendTo(h),
           $("<div>").appendTo(hIframe).hide().append("<iframe>"),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
+let unmutedFlag = false;
 function playYouTube(id) {
     if(!id) return console.error("YouTube id is empty");
     const yt = new YT.Player($("<div>").appendTo(iframes[YouTube].empty()).get(0),{
@@ -141,7 +142,10 @@ function playYouTube(id) {
         },
         events: {
             onReady: e => {
-                if(isSmartPhone) e.target.mute();
+                if(isSmartPhone && !unmutedFlag) {
+                    unmutedFlag = true;
+                    e.target.mute();
+                }
                 e.target.playVideo();
             },
             onStateChange: e => {
