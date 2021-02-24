@@ -77,7 +77,7 @@ function judgeURL(url){
     }
     return false;
 }
-$('<style>').prependTo(h).html(".item:hover{background-color:rgba(255, 0, 0, 0.3);}");
+$('<style>').prependTo(h).html(".item:hover{background-color:rgba(255, 0, 0, 0.3);cursor: pointer;}");
 h.append("<br>");
 $("<button>").appendTo(h).text("prev").on("click",()=>move(-1));
 $("<button>").appendTo(h).text("next").on("click",()=>move(1));
@@ -136,9 +136,13 @@ function playYouTube(id) {
     const yt = new YT.Player($("<div>").appendTo(iframes[YouTube].empty()).get(0),{
         videoId: id,
         playerVars: {
-            autoplay: 1
+            playsinline: 1
         },
         events: {
+            onReady: e => {
+                e.target.mute();
+                e.target.playVideo();
+            },
             onStateChange: e => {
                 console.log(rpgen3.getTime() + ' ' + e.target.getPlayerState());
                 if(e.target.getPlayerState() !== YT.PlayerState.ENDED) return;
