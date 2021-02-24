@@ -32,13 +32,12 @@ const ids = [];
 function loadList(){
     while(ids.length) clearTimeout(ids.pop());
     hItems.empty();
-    g_list = inputURL().split('\n').filter(v=>v).map((url,i)=>{
-        const r = judgeURL(url);
+    g_list = inputURL().split('\n').filter(v=>v).map(judgeURL).filter(v=>v);
+    g_list.forEach((v,i)=>{
         ids.push(setTimeout(()=>{
             let elm;
-            if(!r) return console.error(`${url} is not video URL`);
-            else if(r[0] === YouTube) elm = $("<img>",{src:`https://i.ytimg.com/vi/${r[1]}/hqdefault.jpg`});
-            else if(r[0] === Nico) elm = $("<iframe>").attr({src:`https://ext.nicovideo.jp/thumb/sm${r[1]}`});
+            if(v[0] === YouTube) elm = $("<img>",{src:`https://i.ytimg.com/vi/${v[1]}/hqdefault.jpg`});
+            else if(v[0] === Nico) elm = $("<iframe>").attr({src:`https://ext.nicovideo.jp/thumb/sm${v[1]}`});
             const h = $("<div>").appendTo(hItems).css({
                 position: "relative",
                 float: "left"
@@ -56,11 +55,9 @@ function loadList(){
                 left: 0,
                 bottom: 0,
                 right: 0
-            }).addClass("item");
+            }).addClass("item").on("click",()=>jump(i));
         },200*i));
-        return r;
-    }).filter(v=>v);
-    $(".item").each((i,e)=>$(e).on("click",()=>jump(i)));
+    });
     unplayed = prevIdx = null;
     setTimeout(()=>jump(0),1000);
 }
@@ -174,12 +171,20 @@ function jump(n){
     else if(r[0] === Nico) playNico(r[1]);
 }
 function resize(elm){
-    const w = $(window).width() * 0.9;
+    const w = $(window).width(),
+          h = $(window).height();
+    let w2, h2;
+    if(w < h) {
+        w2 = w;
+        h2 = w2 * (9/16);
+    }
+    else {
+        h2 = h * 0.6;
+        w2 = h2 * (16/9);
+    }
     elm.attr({
-        width: w,
-        height: w * (9/16)
-    }).css({
-        maxHeight: "70vh"
+        width: w2,
+        height: h2
     });
 }
 function onResize(elm){
