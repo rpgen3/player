@@ -22,6 +22,7 @@ $.get(`list.txt`,r=>{
         value: r
     });
 });
+h.append("<br>");
 $("<button>").appendTo(h).text("リストを読み込む").on("click",loadList);
 const hItems = $("<div>").appendTo(h).css({
     overflowY: "scroll",
