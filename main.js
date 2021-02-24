@@ -160,6 +160,7 @@ function move(n){
     const r = g_list[g_idx];
     if(r[0] === YouTube) playYouTube(r[1]);
     else if(r[0] === Nico) playNico(r[1]);
+    fixScrollTop();
 }
 function jump(n){
     resetVideos();
@@ -169,6 +170,15 @@ function jump(n){
     const r = g_list[g_idx];
     if(r[0] === YouTube) playYouTube(r[1]);
     else if(r[0] === Nico) playNico(r[1]);
+    fixScrollTop();
+}
+let prevScroll = 0;
+$(window).on("scroll",()=>{
+    const y = $(window).scrollTop();
+    if(y) prevScroll = y;
+});
+function fixScrollTop(){
+    setTimeout(()=>$(window).scrollTop(prevScroll),500);
 }
 function resize(elm){
     const w = $(window).width(),
@@ -205,6 +215,7 @@ const hIframe = $("<div>").appendTo(h),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
 let unmutedFlag = false;
+
 function playYouTube(id) {
     if(!id) return console.error("YouTube id is empty");
     const yt = new YT.Player($("<div>").appendTo(iframes[YouTube].empty()).get(0),{
