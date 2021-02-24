@@ -198,7 +198,7 @@ function resize(elm){
     });
 }
 function onResize(elm){
-    $(window).on("resize",()=>resize(elm)).trigger("resize");
+    $(window).off("resize").on("resize",()=>resize(elm)).trigger("resize");
 }
 function resetVideos(){
     hIframe.children().each((i,e)=>$(e).hide());
