@@ -178,7 +178,7 @@ $(window).on("scroll",()=>{
     if(y) prevScroll = y;
 });
 function fixScrollTop(){
-    setTimeout(()=>$(window).scrollTop(prevScroll),500);
+    $(window).scrollTop(prevScroll);
 }
 function resize(elm){
     const w = $(window).width(),
