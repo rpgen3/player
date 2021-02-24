@@ -35,27 +35,34 @@ function loadList(){
     g_list = inputURL().split('\n').filter(v=>v).map(judgeURL).filter(v=>v);
     g_list.forEach((v,i)=>{
         ids.push(setTimeout(()=>{
-            let elm;
-            if(v[0] === YouTube) elm = $("<img>",{src:`https://i.ytimg.com/vi/${v[1]}/hqdefault.jpg`});
-            else if(v[0] === Nico) elm = $("<iframe>").attr({src:`https://ext.nicovideo.jp/thumb/sm${v[1]}`});
             const h = $("<div>").appendTo(hItems).css({
                 position: "relative",
                 float: "left"
             });
-            elm.appendTo(h).css({
+            let tag, url;
+            if(v[0] === YouTube) {
+                tag = "img";
+                url = `https://i.ytimg.com/vi/${v[1]}/hqdefault.jpg`;
+            }
+            else if(v[0] === Nico) {
+                tag = "iframe";
+                url = `https://ext.nicovideo.jp/thumb/sm${v[1]}`;
+            }
+            $(`<${tag}>`).on("load",function(){
+                h.css({
+                    width: $(this).width(),
+                    height: $(this).height()
+                });
+                $("<div>").appendTo(h).css({
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                }).addClass("item").on("click",()=>jump(i));
+            }).attr("src",url).appendTo(h).css({
                 maxHeight: 100,
             });
-            h.css({
-                width: elm.width(),
-                height: elm.height()
-            });
-            $("<div>").appendTo(h).css({
-                position: "absolute",
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0
-            }).addClass("item").on("click",()=>jump(i));
         },200*i));
     });
     unplayed = prevIdx = null;
