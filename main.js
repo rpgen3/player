@@ -14,10 +14,10 @@ rpgen3.addHideArea(h,{
     id2: "inputURL"
 });
 let inputURL;
-$.get(`sample.txt`,r=>{
+$.get(`list.txt`,r=>{
     inputURL = rpgen3.addInputText("#inputURL",{
         textarea: true,
-        save:  "動画URLリスト",
+        save:  "動画URLリスト入力欄",
         placeholder: "YouTubeとニコニコ動画のURL",
         value: r
     });
@@ -57,6 +57,7 @@ function loadList(){
     }).filter(v=>v);
     $(".item").each((i,e)=>$(e).on("click",()=>jump(i)));
     jump(0);
+    unplayed = prevIdx = null;
 }
 function judgeURL(url){
     if(!url) return console.error("url is empty");
@@ -77,42 +78,102 @@ function judgeURL(url){
     }
     return false;
 }
-$('<style>').prependTo(h).html(".item:hover{background-color:rgba(255, 0, 0, 0.3);cursor: pointer;}");
+$('<style>').prependTo(h).html(`
+.item:hover {
+cursor: pointer;
+background-color:rgba(0, 255, 0, 0.3);
+}
+.active {
+background-color:rgba(255, 0, 0, 0.3);
+}
+.active:hover {
+background-color:rgba(127, 127, 0, 0.3);
+}
+`);
+let prevIdx = null;
+function setActive(i){
+    if(null !== prevIdx) $(".item").eq(prevIdx).removeClass("active");
+    $(".item").eq(i).addClass("active");
+}
 h.append("<br>");
 $("<button>").appendTo(h).text("prev").on("click",()=>move(-1));
 $("<button>").appendTo(h).text("next").on("click",()=>move(1));
 const loopOneFlag = rpgen3.addInputBool(h,{
-    title: "単体ループ",
-    save: "単体ループ"
+    title: "1曲リピート",
+    save: "1曲リピート"
 });
 const loopAllFlag = rpgen3.addInputBool(h,{
-    title: "全体ループ",
-    save: "全体ループ"
+    title: "全曲リピート",
+    save: "全曲リピート"
 });
+const shuffleFlag = rpgen3.addInputBool(h,{
+    title: "シャッフル再生",
+    save: "シャッフル再生"
+});
+class Unplayed {
+    constructor(){
+        this.ar = rpgen3.makeArray(g_list.length);
+    }
+    exclude(i){
+        this.ar = this.ar.filter(v=>v!==i);
+        return i;
+    }
+    random(){
+        if(!this.ar.length) return false;
+        return this.exclude(rpgen3.randArray(this.ar));
+    }
+}
+let unplayed;
+function getRandom(){
+    if(!g_list.length) return;
+    if(!unplayed){
+        unplayed = new Unplayed();
+        return getRandom();
+    }
+    const result = unplayed.random();
+    if(false === result) {
+        if(!loopAllFlag()) return false;
+        unplayed = new Unplayed();
+        return getRandom();
+    }
+    return result;
+}
 function move(n){
     resetVideos();
-    g_idx += n;
-    if(0 > g_idx) g_idx = loopAllFlag() ? g_list.length - 1 : 0;
-    else if(g_list.length - 1 < g_idx) {
-        if(!loopAllFlag()) return (g_idx = g_list.length - 1);
-        g_idx = 0;
+    if(shuffleFlag()){
+        const result = getRandom();
+        if(false === result) return;
+        g_idx = result;
     }
+    else {
+        g_idx += n;
+        if(0 > g_idx) g_idx = loopAllFlag() ? g_list.length - 1 : 0;
+        else if(g_list.length - 1 < g_idx) {
+            if(!loopAllFlag()) return (g_idx = g_list.length - 1);
+            g_idx = 0;
+        }
+    }
+    setActive(g_idx);
     const r = g_list[g_idx];
     if(r[0] === YouTube) playYouTube(r[1]);
     else if(r[0] === Nico) playNico(r[1]);
 }
 function jump(n){
     resetVideos();
+    if(unplayed) unplayed.exclude(n);
     g_idx = n;
+    setActive(g_idx);
     const r = g_list[g_idx];
     if(r[0] === YouTube) playYouTube(r[1]);
     else if(r[0] === Nico) playNico(r[1]);
 }
 function resize(elm){
-    const w = $(window).width() * 0.7;
+    const w = $(window).width() * 0.9;
     elm.attr({
         width: w,
         height: w * (9/16)
+    }).css({
+        maxHeight: "70vh"
     });
 }
 function onResize(elm){
