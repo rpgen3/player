@@ -109,7 +109,7 @@ function jump(n){
     else if(r[0] === Nico) playNico(r[1]);
 }
 function resize(elm){
-    const w = $(window).width() * 0.9;
+    const w = $(window).width() * 0.7;
     elm.attr({
         width: w,
         height: w * (9/16)
