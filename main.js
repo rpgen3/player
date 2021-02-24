@@ -14,7 +14,7 @@ rpgen3.addHideArea(h,{
     id2: "inputURL"
 });
 let inputURL;
-$.get(`list.txt`,r=>{
+$.get(`sample.txt`,r=>{
     inputURL = rpgen3.addInputText("#inputURL",{
         textarea: true,
         save:  "動画URLリスト入力欄",
