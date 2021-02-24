@@ -130,7 +130,8 @@ const hIframe = $("<div>").appendTo(h),
       iframes = [
           $("<div>").appendTo(hIframe).hide(),
           $("<div>").appendTo(hIframe).hide().append("<iframe>"),
-      ];
+      ],
+      isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
 function playYouTube(id) {
     if(!id) return console.error("YouTube id is empty");
     const yt = new YT.Player($("<div>").appendTo(iframes[YouTube].empty()).get(0),{
@@ -140,7 +141,7 @@ function playYouTube(id) {
         },
         events: {
             onReady: e => {
-                e.target.mute();
+                if(isSmartPhone) e.target.mute();
                 e.target.playVideo();
             },
             onStateChange: e => {
