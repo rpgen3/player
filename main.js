@@ -57,7 +57,7 @@ function loadList(){
                 bottom: 0,
                 right: 0
             }).addClass("item");
-        },500*i));
+        },200*i));
         return r;
     }).filter(v=>v);
     $(".item").each((i,e)=>$(e).on("click",()=>jump(i)));
