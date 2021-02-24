@@ -181,8 +181,8 @@ function fixScrollTop(){
     $(window).scrollTop(prevScroll);
 }
 function resize(elm){
-    const w = $(window).width(),
-          h = $(window).height();
+    const w = $(window).width() * 0.8,
+          h = $(window).height() * 0.8;
     let w2, h2;
     if(w < h) {
         w2 = w;
