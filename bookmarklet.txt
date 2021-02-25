@@ -1,0 +1,1 @@
+javascript:var e=document.createElement("textarea");e.textContent=`https://api.soundcloud.com/tracks/${document.body.innerHTML.match(/tracks:([0-9]+)/)[1]}`;document.body.appendChild(e);e.select();document.execCommand("copy");document.body.removeChild(e)
