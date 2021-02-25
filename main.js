@@ -48,7 +48,7 @@ function loadList(){
                 tag = "iframe";
                 url = `https://ext.nicovideo.jp/thumb/sm${v[1]}`;
             }
-            $(`<${tag}>`).on("load",function(){
+            $(`<${tag}>`).appendTo(h).on("load",function(){
                 h.css({
                     width: $(this).width(),
                     height: $(this).height()
@@ -60,7 +60,11 @@ function loadList(){
                     bottom: 0,
                     right: 0
                 }).addClass("item").on("click",()=>jump(i));
-            }).attr("src",url).appendTo(h).css({
+            }).attr({
+                src: url,
+                scrolling: "no",
+                frameborder: "no"
+            }).css({
                 maxHeight: 100,
             });
         },200*i));
@@ -228,7 +232,7 @@ function playYouTube(id) {
     const yt = new YT.Player($("<div>").appendTo(iframes[YouTube].empty()).get(0),{
         videoId: id,
         playerVars: {
-            playsinline: 1
+            playsinline: 1,
         },
         events: {
             onReady: e => {
@@ -251,7 +255,11 @@ function playYouTube(id) {
 const NicoOrigin = 'https://embed.nicovideo.jp';
 function playNico(id){
     if(!id) return console.error("niconico id is empty");
-    onResize(iframes[Nico].find("iframe").attr("src",`//embed.nicovideo.jp/watch/sm${id}?jsapi=1`));
+    onResize(iframes[Nico].find("iframe").attr({
+        src: `//embed.nicovideo.jp/watch/sm${id}?jsapi=1`,
+        allowfullscreen: 1,
+        playsinline: 1
+    }));
     showVideo(Nico);
     setTimeout(()=>postMessage({
         eventName: "play"
