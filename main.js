@@ -307,14 +307,9 @@ window.addEventListener('message', e => {
         }
     });
 });
-let prevWidget;
+let widget;
 function playSoundCloud(id){
     if(!id) return console.error("soundcloud id is empty");
-    const p = {
-        auto_play: true,
-        show_teaser: true,
-        visual: true
-    };
     const elm = iframes[SoundCloud].find("iframe").attr({
         scrolling: "no",
         frameborder: "no",
@@ -324,12 +319,14 @@ function playSoundCloud(id){
     });
     onResize(elm);
     showVideo(SoundCloud);
-    if(prevWidget){
-        prevWidget.unbind(SC.Widget.Events.READY);
-        prevWidget.unbind(SC.Widget.Events.FINISH);
+    if(!widget) {
+        widget = SC.Widget(elm.get(0));
+        widget.bind(SC.Widget.Events.READY,()=>widget.play());
+        widget.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? widget.play() : move(1));
     }
-    const w = SC.Widget(elm.get(0));
-    w.bind(SC.Widget.Events.READY,()=>w.play());
-    w.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? w.play() : move(1));
-    prevWidget = w;
+    widget.load(`https://api.soundcloud.com/tracks/${id}`,{
+        auto_play: true,
+        show_teaser: true,
+        visual: true
+    });
 }
