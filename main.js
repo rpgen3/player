@@ -114,10 +114,10 @@ function judgeURL(url){
 $('<style>').prependTo(h).html(`
 .item:hover {
 cursor: pointer;
-background-color:rgba(0, 255, 0, 0.3);
+background-color:rgba(255, 0, 0, 0.3);
 }
 .active {
-background-color:rgba(255, 0, 0, 0.3);
+background-color:rgba(0, 255, 0, 0.3);
 }
 .active:hover {
 background-color:rgba(127, 127, 0, 0.6);
