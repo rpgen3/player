@@ -92,7 +92,7 @@ function loadList(){
                 scrolling: "no",
                 frameborder: "no"
             });
-        },500*i));
+        },60/130*1000*i));
     });
     unplayed = prevIdx = null;
     jump(0);
