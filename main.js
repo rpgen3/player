@@ -325,9 +325,11 @@ function playSoundCloud(id){
         widget = SC.Widget(elm.get(0));
         widget.bind(SC.Widget.Events.READY,()=>widget.play());
         widget.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? widget.play() : move(1));
-        elm.attr("src",`https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&'));
     }
-    else widget.load(`https%3A//api.soundcloud.com/tracks/${id}`,p);
+    else {
+        widget.load(`https%3A//api.soundcloud.com/tracks/${id}`,p);
+    }
+    elm.attr("src",`https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&'));
     onResize(elm);
     showVideo(SoundCloud);
 }
