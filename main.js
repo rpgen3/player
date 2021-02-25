@@ -235,8 +235,8 @@ function onResize(elm){
 function resetVideos(){
     hIframe.children().each((i,e)=>$(e).hide());
     iframes[YouTube].empty();
-    iframes[Nico].find("iframe").attr("src","");
-    iframes[SoundCloud].empty();
+    iframes[Nico].find("iframe").attr('src','');
+    iframes[SoundCloud].find("iframe").attr('src','');
 }
 function showVideo(videoType){
     hIframe.children().eq(videoType).show();
@@ -245,7 +245,7 @@ const hIframe = $("<div>").appendTo(h),
       iframes = [
           $("<div>").appendTo(hIframe).hide(),
           $("<div>").appendTo(hIframe).hide().append("<iframe>"),
-          $("<div>").appendTo(hIframe).hide(),
+          $("<div>").appendTo(hIframe).hide().append("<iframe>"),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
 let unmutedFlag = false;
@@ -285,11 +285,11 @@ function playNico(id){
         allow: "autoplay"
     }));
     showVideo(Nico);
-    setTimeout(()=>postMessage({
+    setTimeout(()=>postMessageNico({
         eventName: "play"
     }),3000);
 }
-function postMessage(request) {
+function postMessageNico(request) {
     hIframe.find("iframe").get(0).contentWindow.postMessage(Object.assign({
         sourceConnectorType: 1,
     }, request), NicoOrigin);
@@ -300,7 +300,7 @@ window.addEventListener('message', e => {
     console.log(rpgen3.getTime() + ' ' + data.playerStatus);
     if(data.playerStatus !== 4) return;
     if (!loopOneFlag()) return move(1);
-    postMessage({
+    postMessageNico({
         eventName: 'seek',
         data: {
             time: 0
@@ -314,7 +314,7 @@ function playSoundCloud(id){
         show_teaser: true,
         visual: true
     };
-    const elm = $("<iframe>").appendTo(iframes[SoundCloud]).attr({
+    const elm = iframes[SoundCloud].find("iframe").attr({
         scrolling: "no",
         frameborder: "no",
         playsinline: 1,
