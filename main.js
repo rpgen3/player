@@ -13,11 +13,12 @@ const h = $("<div>").appendTo($("body")).css({
 $("<h1>",{text:"YouTube and Nicovideo Player"}).appendTo(h);
 rpgen3.addHideArea(h,{
     title: "動画URLリスト入力欄",
-    id2: "inputURL"
+    id2: "hideArea"
 });
 let inputURL;
 $.get(`sample.txt`,r=>{
-    inputURL = rpgen3.addInputText("#inputURL",{
+    inputURL = rpgen3.addInputText("#hideArea",{
+        id: "inputURL",
         textarea: true,
         save:  "動画URLリスト入力欄",
         placeholder: "YouTubeとニコニコ動画のURL",
@@ -36,54 +37,62 @@ function loadList(){
     hItems.empty();
     g_list = inputURL().split('\n').filter(v=>v).map(judgeURL).filter(v=>v);
     g_list.forEach((v,i)=>{
+        const h = $("<div>").appendTo(hItems).css({
+            position: "relative",
+            float: "left"
+        }),
+              cover = $("<div>").appendTo(h).addClass("item"),
+              id = v[1],
+              [ tag, url ] = (()=>{
+                  switch(v[0]){
+                      case YouTube: return ["img", `https://i.ytimg.com/vi/${id}/hqdefault.jpg`];
+                      case Nico: return ["iframe", `https://ext.nicovideo.jp/thumb/sm${id}`];
+                      case SoundCloud: {
+                          const p = {
+                              auto_play: false,
+                              buying: false,
+                              liking: false,
+                              download: false,
+                              sharing: false,
+                              show_comments: false,
+                              show_playcount: false,
+                              visual: true,
+                          };
+                          return [
+                              "iframe",
+                              `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&`
+                              + Object.keys(p).map(v=>v+'='+p[v]).join('&')
+                          ];
+                      }
+                  }
+              })();
         ids.push(setTimeout(()=>{
-            const h = $("<div>").appendTo(hItems).css({
-                position: "relative",
-                float: "left"
-            });
-            let tag, url;
-            if(v[0] === YouTube) {
-                tag = "img";
-                url = `https://i.ytimg.com/vi/${v[1]}/hqdefault.jpg`;
-            }
-            else if(v[0] === Nico) {
-                tag = "iframe";
-                url = `https://ext.nicovideo.jp/thumb/sm${v[1]}`;
-            }
-            else if(v[0] === SoundCloud) {
-                const p = {
-                    auto_play: false,
-                    buying: false,
-                    liking: false,
-                    download: false,
-                    sharing: false,
-                    show_comments: false,
-                    show_playcount: false,
-                    visual: true,
-                };
-                tag = "iframe";
-                url = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${v[1]}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&');
-            }
-            $(`<${tag}>`).appendTo(h).on("load",function(){
+            $(`<${tag}>`).prependTo(h).on("load",function(){
                 h.css({
                     width: $(this).width(),
                     height: $(this).height()
                 });
-                $("<div>").appendTo(h).css({
+                cover.css({
                     position: "absolute",
                     top: 0,
                     left: 0,
                     bottom: 0,
                     right: 0
-                }).addClass("item").on("click",()=>jump(i));
+                }).on("click",()=>jump(i)).on('contextmenu',()=>{
+                    const idx = inputURL().indexOf(id),
+                          e = $("#inputURL").get(0);
+                    e.focus();
+                    e.setSelectionRange(idx,idx+id.length);
+                    return false;
+                });
+            }).css({
+                maxHeight: 100,
             }).attr({
                 src: url,
                 scrolling: "no",
                 frameborder: "no"
-            }).css({
-                maxHeight: 100,
             });
-        },200*i));
+        }, 400*i));
     });
     unplayed = prevIdx = null;
     setTimeout(()=>jump(0),1000);
@@ -320,6 +329,7 @@ function playSoundCloud(id){
     const elm = $("<iframe>").appendTo(iframes[SoundCloud]).attr({
         scrolling: "no",
         frameborder: "no",
+        playsinline: 1,
         allow: "autoplay",
         src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&')
     });
