@@ -95,7 +95,7 @@ function loadList(){
         },500*i));
     });
     unplayed = prevIdx = null;
-    setTimeout(()=>jump(0),1000);
+    jump(0);
 }
 function judgeURL(url){
     if(!url) return;
