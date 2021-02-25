@@ -307,6 +307,7 @@ window.addEventListener('message', e => {
         }
     });
 });
+let prevWidget;
 function playSoundCloud(id){
     if(!id) return console.error("soundcloud id is empty");
     const p = {
@@ -323,7 +324,12 @@ function playSoundCloud(id){
     });
     onResize(elm);
     showVideo(SoundCloud);
+    if(prevWidget){
+        prevWidget.unbind(SC.Widget.Events.READY);
+        prevWidget.unbind(SC.Widget.Events.FINISH);
+    }
     const w = SC.Widget(elm.get(0));
     w.bind(SC.Widget.Events.READY,()=>w.play());
     w.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? w.play() : move(1));
+    prevWidget = w;
 }
