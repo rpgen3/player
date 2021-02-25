@@ -316,8 +316,6 @@ function playSoundCloud(id){
         playsinline: 1,
         allow: "autoplay",
     });
-    onResize(elm);
-    showVideo(SoundCloud);
     if(!widget) {
         widget = SC.Widget(elm.get(0));
         widget.bind(SC.Widget.Events.READY,()=>widget.play());
@@ -328,4 +326,6 @@ function playSoundCloud(id){
         show_teaser: true,
         visual: true
     });
+    onResize(elm);
+    showVideo(SoundCloud);
 }
