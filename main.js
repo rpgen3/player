@@ -10,7 +10,7 @@ const h = $("<div>").appendTo($("body")).css({
     "text-align": "center",
     padding: "1em"
 });
-$("<h1>",{text:"YouTube and Nicovideo Player"}).appendTo(h);
+$("<h2>",{text:"YouTube Nicovideo SoundCloud Player"}).appendTo(h);
 rpgen3.addHideArea(h,{
     title: "動画URLリスト入力欄",
     id2: "hideArea"
@@ -21,7 +21,7 @@ $.get(`sample.txt`,r=>{
         id: "inputURL",
         textarea: true,
         save:  "動画URLリスト入力欄",
-        placeholder: "YouTubeとニコニコ動画のURL",
+        placeholder: "YouTubeとニコニコ動画とSoundCloudのURL\nSoundCloudは埋め込みURLじゃないと使えないので注意",
         value: r
     });
 });
@@ -120,18 +120,6 @@ function judgeURL(url){
     }
     return console.error("this url is not supported\n" + url);
 }
-$('<style>').prependTo(h).html(`
-.item:hover {
-cursor: pointer;
-background-color:rgba(255, 0, 0, 0.3);
-}
-.active {
-background-color:rgba(0, 255, 0, 0.3);
-}
-.active:hover {
-background-color:rgba(127, 127, 0, 0.6);
-}
-`);
 let prevIdx = null;
 function setActive(i){
     if(null !== prevIdx) $(".item").eq(prevIdx).removeClass("active");
@@ -339,8 +327,3 @@ function playSoundCloud(id){
     w.bind(SC.Widget.Events.READY,()=>w.play());
     w.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? w.play() : move(1));
 }
-$("<link>").appendTo("head").attr({
-    rel: "icon",
-    type: "image/gif",
-    href: "https://i.imgur.com/fdD7ZnG.gif"
-});
