@@ -1,8 +1,10 @@
 const rpgen3 = window.rpgen3,
       $ = window.$;
 $.getScript("https://www.youtube.com/iframe_api");
+$.getScript("https://w.soundcloud.com/player/api.js");
 const YouTube = 0,
-      Nico = 1;
+      Nico = 1,
+      SoundCloud = 2;
 let g_list, g_idx;
 const h = $("<div>").appendTo($("body")).css({
     "text-align": "center",
@@ -48,6 +50,20 @@ function loadList(){
                 tag = "iframe";
                 url = `https://ext.nicovideo.jp/thumb/sm${v[1]}`;
             }
+            else if(v[0] === SoundCloud) {
+                const p = {
+                    auto_play: false,
+                    buying: false,
+                    liking: false,
+                    download: false,
+                    sharing: false,
+                    show_comments: false,
+                    show_playcount: false,
+                    visual: true,
+                };
+                tag = "iframe";
+                url = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${v[1]}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&');
+            }
             $(`<${tag}>`).appendTo(h).on("load",function(){
                 h.css({
                     width: $(this).width(),
@@ -73,7 +89,7 @@ function loadList(){
     setTimeout(()=>jump(0),1000);
 }
 function judgeURL(url){
-    if(!url) return console.error("url is empty");
+    if(!url) return;
     const d = rpgen3.getDomain(url).reverse();
     let m;
     switch(d[1] + '.' + d[0]){
@@ -88,8 +104,12 @@ function judgeURL(url){
             m = url.match(/sm([0-9]+)/);
             if(!m) break;
             return [ Nico, m[1] ];
+        case "soundcloud.com":
+            m = url.match(/\/tracks\/([0-9]+)/);
+            if(!m) break;
+            return [ SoundCloud, m[1] ];
     }
-    return false;
+    return console.error("this url is not supported\n" + url);
 }
 $('<style>').prependTo(h).html(`
 .item:hover {
@@ -100,7 +120,7 @@ background-color:rgba(0, 255, 0, 0.3);
 background-color:rgba(255, 0, 0, 0.3);
 }
 .active:hover {
-background-color:rgba(127, 127, 0, 0.3);
+background-color:rgba(127, 127, 0, 0.6);
 }
 `);
 let prevIdx = null;
@@ -167,20 +187,24 @@ function move(n){
             g_idx = 0;
         }
     }
-    setActive(g_idx);
-    const r = g_list[g_idx];
-    if(r[0] === YouTube) playYouTube(r[1]);
-    else if(r[0] === Nico) playNico(r[1]);
-    fixScrollTop();
+    play();
 }
 function jump(n){
     resetVideos();
     if(unplayed) unplayed.exclude(n);
     g_idx = n;
+    play();
+}
+function play(){
     setActive(g_idx);
     const r = g_list[g_idx];
-    if(r[0] === YouTube) playYouTube(r[1]);
-    else if(r[0] === Nico) playNico(r[1]);
+    (()=>{
+        switch(r[0]){
+            case YouTube: return playYouTube;
+            case Nico: return playNico;
+            case SoundCloud: return playSoundCloud;
+        }
+    })()(r[1]);
     fixScrollTop();
 }
 let prevScroll = 0;
@@ -192,8 +216,8 @@ function fixScrollTop(){
     $(window).scrollTop(prevScroll);
 }
 function resize(elm){
-    const w = $(window).width() * 0.8,
-          h = $(window).height() * 0.8;
+    const w = $(window).width() * 0.9,
+          h = $(window).height() * 0.9;
     let w2, h2;
     if(w < h) {
         w2 = w;
@@ -215,6 +239,7 @@ function resetVideos(){
     hIframe.children().each((i,e)=>$(e).hide());
     iframes[YouTube].empty();
     iframes[Nico].find("iframe").attr("src","");
+    iframes[SoundCloud].empty();
 }
 function showVideo(videoType){
     hIframe.children().eq(videoType).show();
@@ -223,13 +248,14 @@ const hIframe = $("<div>").appendTo(h),
       iframes = [
           $("<div>").appendTo(hIframe).hide(),
           $("<div>").appendTo(hIframe).hide().append("<iframe>"),
+          $("<div>").appendTo(hIframe).hide(),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
 let unmutedFlag = false;
 
 function playYouTube(id) {
     if(!id) return console.error("YouTube id is empty");
-    const yt = new YT.Player($("<div>").appendTo(iframes[YouTube].empty()).get(0),{
+    const yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0),{
         videoId: id,
         playerVars: {
             playsinline: 1,
@@ -258,7 +284,8 @@ function playNico(id){
     onResize(iframes[Nico].find("iframe").attr({
         src: `//embed.nicovideo.jp/watch/sm${id}?jsapi=1`,
         allowfullscreen: 1,
-        playsinline: 1
+        playsinline: 1,
+        allow: "autoplay"
     }));
     showVideo(Nico);
     setTimeout(()=>postMessage({
@@ -283,6 +310,25 @@ window.addEventListener('message', e => {
         }
     });
 });
+function playSoundCloud(id){
+    if(!id) return console.error("soundcloud id is empty");
+    const p = {
+        auto_play: true,
+        show_teaser: true,
+        visual: true
+    };
+    const elm = $("<iframe>").appendTo(iframes[SoundCloud]).attr({
+        scrolling: "no",
+        frameborder: "no",
+        allow: "autoplay",
+        src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&')
+    });
+    onResize(elm);
+    showVideo(SoundCloud);
+    const w = SC.Widget(elm.get(0));
+    w.bind(SC.Widget.Events.READY,()=>w.play());
+    w.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? w.play() : move(1));
+}
 $("<link>").appendTo("head").attr({
     rel: "icon",
     type: "image/gif",
