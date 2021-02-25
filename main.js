@@ -317,15 +317,19 @@ function playSoundCloud(id){
         allow: "autoplay",
     });
     if(!widget) {
+        const p = {
+            auto_play: true,
+            show_teaser: true,
+            visual: true
+        };
         widget = SC.Widget(elm.get(0));
         widget.bind(SC.Widget.Events.READY,()=>widget.play());
         widget.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? widget.play() : move(1));
+        elm.attr("src",`https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&'));
     }
-    widget.load(`https://api.soundcloud.com/tracks/${id}`,{
-        auto_play: true,
-        show_teaser: true,
-        visual: true
-    });
+    else {
+        widget.load(`https://api.soundcloud.com/tracks/${id}`);
+    }
     onResize(elm);
     showVideo(SoundCloud);
 }
