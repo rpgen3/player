@@ -235,8 +235,8 @@ function onResize(elm){
 function resetVideos(){
     hIframe.children().each((i,e)=>$(e).hide());
     iframes[YouTube].empty();
-    iframes[Nico].find("iframe").attr('src','');
-    iframes[SoundCloud].find("iframe").attr('src','');
+    iframes[Nico].find("iframe").attr("src","");
+    iframes[SoundCloud].empty();
 }
 function showVideo(videoType){
     hIframe.children().eq(videoType).show();
@@ -245,7 +245,7 @@ const hIframe = $("<div>").appendTo(h),
       iframes = [
           $("<div>").appendTo(hIframe).hide(),
           $("<div>").appendTo(hIframe).hide().append("<iframe>"),
-          $("<div>").appendTo(hIframe).hide().append("<iframe>"),
+          $("<div>").appendTo(hIframe).hide(),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
 let unmutedFlag = false;
@@ -285,11 +285,11 @@ function playNico(id){
         allow: "autoplay"
     }));
     showVideo(Nico);
-    setTimeout(()=>postMessageNico({
+    setTimeout(()=>postMessage({
         eventName: "play"
     }),3000);
 }
-function postMessageNico(request) {
+function postMessage(request) {
     hIframe.find("iframe").get(0).contentWindow.postMessage(Object.assign({
         sourceConnectorType: 1,
     }, request), NicoOrigin);
@@ -300,36 +300,30 @@ window.addEventListener('message', e => {
     console.log(rpgen3.getTime() + ' ' + data.playerStatus);
     if(data.playerStatus !== 4) return;
     if (!loopOneFlag()) return move(1);
-    postMessageNico({
+    postMessage({
         eventName: 'seek',
         data: {
             time: 0
         }
     });
 });
-let widget;
 function playSoundCloud(id){
     if(!id) return console.error("soundcloud id is empty");
-    const elm = iframes[SoundCloud].find("iframe").attr({
-        scrolling: "no",
-        frameborder: "no",
-        playsinline: 1,
-        allow: "autoplay",
-    });
     const p = {
         auto_play: true,
         show_teaser: true,
         visual: true
     };
-    if(!widget) {
-        widget = SC.Widget(elm.get(0));
-        widget.bind(SC.Widget.Events.READY,()=>widget.play());
-        widget.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? widget.play() : move(1));
-    }
-    else {
-        widget.load(`https%3A//api.soundcloud.com/tracks/${id}`,p);
-    }
-    elm.attr("src",`https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&'));
+    const elm = $("<iframe>").appendTo(iframes[SoundCloud]).attr({
+        scrolling: "no",
+        frameborder: "no",
+        playsinline: 1,
+        allow: "autoplay",
+        src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&')
+    });
     onResize(elm);
     showVideo(SoundCloud);
+    const w = SC.Widget(elm.get(0));
+    w.bind(SC.Widget.Events.READY,()=>w.play());
+    w.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? w.play() : move(1));
 }
