@@ -282,14 +282,14 @@ function playNico(id){
         allow: "autoplay"
     }));
     showVideo(Nico);
-    setTimeout(()=>postMessage({
+    setTimeout(()=>postNico({
         eventName: "play"
     }),3000);
 }
-function postMessage(request) {
+function postNico(r) {
     hIframe.find("iframe").get(0).contentWindow.postMessage(Object.assign({
         sourceConnectorType: 1,
-    }, request), NicoOrigin);
+    }, r), NicoOrigin);
 }
 window.addEventListener('message', e => {
     if (e.origin !== NicoOrigin || e.data.eventName !== 'playerStatusChange') return;
@@ -297,7 +297,7 @@ window.addEventListener('message', e => {
     console.log(rpgen3.getTime() + ' ' + data.playerStatus);
     if(data.playerStatus !== 4) return;
     if (!loopOneFlag()) return move(1);
-    postMessage({
+    postNico({
         eventName: 'seek',
         data: {
             time: 0
