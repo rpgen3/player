@@ -251,36 +251,27 @@ const hIframe = $("<div>").appendTo(h),
 let g_yt,unmutedFlag = false;
 function playYouTube(id) {
     if(!id) return console.error("YouTube id is empty");
-    if(!g_yt) {
-        g_yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0),{
-            videoId: id,
-            playerVars: {
-                playsinline: 1,
-            },
-            events: {
-                onReady: e => {
-                    setVolume();
-                    if(isSmartPhone && !unmutedFlag) {
-                        unmutedFlag = true;
-                        e.target.mute();
-                    }
-                    e.target.playVideo();
-                },
-                onStateChange: e => {
-                    console.log(rpgen3.getTime() + ' ' + e.target.getPlayerState());
-                    if(e.target.getPlayerState() !== YT.PlayerState.ENDED) return;
-                    loopOneFlag() ? g_yt.playVideo() : move(1);
+    g_yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0),{
+        videoId: id,
+        playerVars: {
+            playsinline: 1,
+        },
+        events: {
+            onReady: e => {
+                setVolume();
+                if(isSmartPhone && !unmutedFlag) {
+                    unmutedFlag = true;
+                    e.target.mute();
                 }
+                e.target.playVideo();
+            },
+            onStateChange: e => {
+                console.log(rpgen3.getTime() + ' ' + e.target.getPlayerState());
+                if(e.target.getPlayerState() !== YT.PlayerState.ENDED) return;
+                loopOneFlag() ? g_yt.playVideo() : move(1);
             }
-        });
-    }
-    else {
-        g_yt.loadVideoById({
-            videoId: id,
-            //startSeconds: 5,
-            //endSeconds: 10,
-        });
-    }
+        }
+    });
     onResize(iframes[YouTube].find("iframe"));
     showVideo(YouTube);
 }
