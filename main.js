@@ -128,6 +128,14 @@ function setActive(i){
     $(".item").eq(i).addClass("active");
 }
 h.append("<br>");
+const inputVolume = rpgen3.addInputRange(h,{
+    title: "音量",
+    min: 0,
+    max: 1,
+    value: 0.5,
+    step: 0.01,
+    change: setVolume
+});
 $("<button>").appendTo(h).text("prev").on("click",()=>move(-1));
 $("<button>").appendTo(h).text("next").on("click",()=>move(1));
 const loopOneFlag = rpgen3.addInputBool(h,{
@@ -236,7 +244,9 @@ function resetVideos(){
     iframes[Nico].find("iframe").attr("src","");
     iframes[SoundCloud].empty();
 }
+let whichVideo;
 function showVideo(videoType){
+    whichVideo = videoType;
     hIframe.children().eq(videoType).show();
 }
 const hIframe = $("<div>").appendTo(h),
@@ -246,16 +256,17 @@ const hIframe = $("<div>").appendTo(h),
           $("<div>").appendTo(hIframe).hide(),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
-let unmutedFlag = false;
+let yt,unmutedFlag = false;
 function playYouTube(id) {
     if(!id) return console.error("YouTube id is empty");
-    const yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0),{
+    yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0),{
         videoId: id,
         playerVars: {
             playsinline: 1,
         },
         events: {
             onReady: e => {
+                setVolume();
                 if(isSmartPhone && !unmutedFlag) {
                     unmutedFlag = true;
                     e.target.mute();
@@ -282,9 +293,12 @@ function playNico(id){
         allow: "autoplay"
     }));
     showVideo(Nico);
-    setTimeout(()=>postNico({
-        eventName: "play"
-    }),3000);
+    setTimeout(()=>{
+        setVolume();
+        postNico({
+            eventName: "play"
+        });
+    },3000);
 }
 function postNico(r) {
     hIframe.find("iframe").get(0).contentWindow.postMessage(Object.assign({
@@ -304,6 +318,7 @@ window.addEventListener('message', e => {
         }
     });
 });
+let scWidget;
 function playSoundCloud(id){
     if(!id) return console.error("soundcloud id is empty");
     const p = {
@@ -320,7 +335,18 @@ function playSoundCloud(id){
     });
     onResize(elm);
     showVideo(SoundCloud);
-    const w = SC.Widget(elm.get(0));
-    w.bind(SC.Widget.Events.READY,()=>w.play());
-    w.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? w.play() : move(1));
+    scWidget = SC.Widget(elm.get(0));
+    scWidget.bind(SC.Widget.Events.READY,()=>{
+        setVolume();
+        scWidget.play();
+    });
+    scWidget.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? scWidget.play() : move(1));
+}
+function setVolume(){
+    const v = inputVolume();
+    switch(whichVideo){
+        case YouTube: return yt.setVolume(v * 100);
+        case Nico: return postNico({eventName: 'volumeChange', data: { volume: v } });
+        case SoundCloud: return scWidget.setVolume(v);
+    }
 }
