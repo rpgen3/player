@@ -346,6 +346,7 @@ function makeInputVolume(){
         }
     })(),
           ttl = `${label}の音量`;
+    inputVolume = null;
     inputVolume = rpgen3.addInputRange(hInputVolume.empty(),{
         title: ttl,
         save: ttl,
@@ -357,6 +358,7 @@ function makeInputVolume(){
     });
 }
 function setVolume(){
+    if(!inputVolume) return;
     const v = inputVolume();
     switch(whichVideo){
         case YouTube: return yt.setVolume(v * 100);
