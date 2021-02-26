@@ -246,7 +246,6 @@ const hIframe = $("<div>").appendTo(h),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
 let unmutedFlag = false;
-
 function playYouTube(id) {
     if(!id) return console.error("YouTube id is empty");
     const yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0),{
