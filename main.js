@@ -1,7 +1,5 @@
 const rpgen3 = window.rpgen3,
       $ = window.$;
-$.getScript("https://www.youtube.com/iframe_api");
-$.getScript("https://w.soundcloud.com/player/api.js");
 const YouTube = 0,
       Nico = 1,
       SoundCloud = 2;
@@ -250,31 +248,40 @@ const hIframe = $("<div>").appendTo(h),
           $("<div>").appendTo(hIframe).hide(),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
-let yt,unmutedFlag = false;
+let g_yt,unmutedFlag = false;
 function playYouTube(id) {
     if(!id) return console.error("YouTube id is empty");
-    yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0),{
-        videoId: id,
-        playerVars: {
-            playsinline: 1,
-        },
-        events: {
-            onReady: e => {
-                setVolume();
-                if(isSmartPhone && !unmutedFlag) {
-                    unmutedFlag = true;
-                    e.target.mute();
-                }
-                e.target.playVideo();
+    if(!g_yt) {
+        g_yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0),{
+            videoId: id,
+            playerVars: {
+                playsinline: 1,
             },
-            onStateChange: e => {
-                console.log(rpgen3.getTime() + ' ' + e.target.getPlayerState());
-                if(e.target.getPlayerState() !== YT.PlayerState.ENDED) return;
-                loopOneFlag() ? yt.playVideo() : move(1);
+            events: {
+                onReady: e => {
+                    setVolume();
+                    if(isSmartPhone && !unmutedFlag) {
+                        unmutedFlag = true;
+                        e.target.mute();
+                    }
+                    e.target.playVideo();
+                },
+                onStateChange: e => {
+                    console.log(rpgen3.getTime() + ' ' + e.target.getPlayerState());
+                    if(e.target.getPlayerState() !== YT.PlayerState.ENDED) return;
+                    loopOneFlag() ? g_yt.playVideo() : move(1);
+                }
             }
-        }
-    });
-    onResize(iframes[YouTube].find("iframe"));
+        });
+        onResize(iframes[YouTube].find("iframe"));
+    }
+    else {
+        g_yt.loadVideoById({
+            videoId: id,
+            //startSeconds: 5,
+            //endSeconds: 10,
+        });
+    }
     showVideo(YouTube);
 }
 const NicoOrigin = 'https://embed.nicovideo.jp';
@@ -360,7 +367,7 @@ function setVolume(){
     if(!inputVolume) return;
     const v = inputVolume();
     switch(whichVideo){
-        case YouTube: return yt.setVolume(v * 100);
+        case YouTube: return g_yt.setVolume(v * 100);
         case Nico: return postNico({eventName: 'volumeChange', data: { volume: v } });
         case SoundCloud: return scWidget.setVolume(v * 100);
     }
