@@ -40,8 +40,8 @@ function loadList(){
         const h = $("<div>").appendTo(hItems).css({
             position: "relative",
             float: "left"
-        }),
-              cover = $("<div>").appendTo(h).addClass("item"),
+        });
+        const cover = $("<div>").appendTo(h).addClass("item"),
               id = v[1],
               [ tag, url ] = (()=>{
                   switch(v[0]){
@@ -142,15 +142,7 @@ const shuffleFlag = rpgen3.addInputBool(h,{
     title: "シャッフル再生",
     save: "シャッフル再生"
 });
-const inputVolume = rpgen3.addInputRange(h,{
-    title: "音量",
-    save: "音量",
-    min: 0,
-    max: 1,
-    value: 0.5,
-    step: 0.01,
-    change: setVolume
-});
+const hInputVolume = $("<div>").appendTo(h);
 class Unplayed {
     constructor(){
         this.ar = rpgen3.makeArray(g_list.length);
@@ -249,6 +241,7 @@ let whichVideo;
 function showVideo(videoType){
     whichVideo = videoType;
     hIframe.children().eq(videoType).show();
+    makeInputVolume();
 }
 const hIframe = $("<div>").appendTo(h),
       iframes = [
@@ -342,6 +335,26 @@ function playSoundCloud(id){
         scWidget.play();
     });
     scWidget.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? scWidget.play() : move(1));
+}
+let inputVolume;
+function makeInputVolume(){
+    const label = (()=>{
+        switch(whichVideo){
+            case YouTube: return "YouTube";
+            case Nico: return "ニコニコ動画";
+            case SoundCloud: return "SoundCloud";
+        }
+    })(),
+          ttl = `${label}の音量`;
+    inputVolume = rpgen3.addInputRange(hInputVolume.empty(),{
+        title: ttl,
+        save: ttl,
+        min: 0,
+        max: 1,
+        value: 0.5,
+        step: 0.01,
+        change: setVolume
+    });
 }
 function setVolume(){
     const v = inputVolume();
