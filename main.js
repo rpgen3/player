@@ -78,7 +78,7 @@ function loadList(){
                     left: 0,
                     bottom: 0,
                     right: 0
-                }).on("click",()=>jump(i)).on('contextmenu',()=>{
+                }).on("click",()=>play(i)).on('contextmenu',()=>{
                     const idx = inputURL().indexOf(id),
                           e = $("#inputURL").get(0);
                     e.focus();
@@ -95,7 +95,7 @@ function loadList(){
         },60/130*1000*i));
     });
     unplayed = prevIdx = null;
-    jump(0);
+    play(0);
 }
 function judgeURL(url){
     if(!url) return;
@@ -146,12 +146,12 @@ class Unplayed {
         this.ar = rpgen3.makeArray(g_list.length);
     }
     exclude(i){
+        if(!this.ar.length) return false;
         this.ar = this.ar.filter(v=>v!==i);
-        return i;
     }
     random(){
         if(!this.ar.length) return false;
-        return this.exclude(rpgen3.randArray(this.ar));
+        return rpgen3.randArray(this.ar);
     }
 }
 let unplayed;
@@ -170,31 +170,28 @@ function getRandom(){
     return result;
 }
 function move(n){
-    resetVideos();
+    let i = g_idx;
     if(shuffleFlag()){
         const result = getRandom();
         if(false === result) return;
-        g_idx = result;
+        i = result;
     }
     else {
-        g_idx += n;
-        if(0 > g_idx) g_idx = loopAllFlag() ? g_list.length - 1 : 0;
-        else if(g_list.length - 1 < g_idx) {
-            if(!loopAllFlag()) return (g_idx = g_list.length - 1);
-            g_idx = 0;
+        i += n;
+        if(0 > i) i = loopAllFlag() ? g_list.length - 1 : 0;
+        else if(g_list.length - 1 < i) {
+            if(!loopAllFlag()) return (i = g_list.length - 1);
+            i = 0;
         }
     }
-    play();
+    play(i);
 }
-function jump(n){
-    resetVideos();
-    if(unplayed) unplayed.exclude(n);
+function play(n){
     g_idx = n;
-    play();
-}
-function play(){
-    setActive(g_idx);
-    const r = g_list[g_idx];
+    resetVideos();
+    setActive(n);
+    if(unplayed) unplayed.exclude(n);
+    const r = g_list[n];
     (()=>{
         switch(r[0]){
             case YouTube: return playYouTube;
