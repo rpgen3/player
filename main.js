@@ -50,13 +50,14 @@ function loadList(){
                       case SoundCloud: {
                           const p = {
                               auto_play: false,
+                              show_teaser: false,
+                              visual: true,
                               buying: false,
                               liking: false,
                               download: false,
                               sharing: false,
                               show_comments: false,
                               show_playcount: false,
-                              visual: true,
                           };
                           return [
                               "iframe",
@@ -307,8 +308,8 @@ function playSoundCloud(id){
     if(!id) return console.error("soundcloud id is empty");
     const p = {
         auto_play: true,
-        show_teaser: true,
-        visual: true
+        show_teaser: false,
+        visual: true,
     };
     const elm = $("<iframe>").appendTo(iframes[SoundCloud]).attr({
         scrolling: "no",
