@@ -338,14 +338,13 @@ function playSoundCloud(id){
 }
 let inputVolume;
 function makeInputVolume(){
-    const label = (()=>{
+    const ttl = (()=>{
         switch(whichVideo){
             case YouTube: return "YouTube";
             case Nico: return "ニコニコ動画";
             case SoundCloud: return "SoundCloud";
         }
-    })(),
-          ttl = `${label}の音量`;
+    })() + "の音量";
     inputVolume = null;
     inputVolume = rpgen3.addInputRange(hInputVolume.empty(),{
         title: ttl,
