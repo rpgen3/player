@@ -273,7 +273,6 @@ function playYouTube(id) {
                 }
             }
         });
-        onResize(iframes[YouTube].find("iframe"));
     }
     else {
         g_yt.loadVideoById({
@@ -282,6 +281,7 @@ function playYouTube(id) {
             //endSeconds: 10,
         });
     }
+    onResize(iframes[YouTube].find("iframe"));
     showVideo(YouTube);
 }
 const NicoOrigin = 'https://embed.nicovideo.jp';
