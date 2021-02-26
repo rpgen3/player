@@ -128,14 +128,6 @@ function setActive(i){
     $(".item").eq(i).addClass("active");
 }
 h.append("<br>");
-const inputVolume = rpgen3.addInputRange(h,{
-    title: "音量",
-    min: 0,
-    max: 1,
-    value: 0.5,
-    step: 0.01,
-    change: setVolume
-});
 $("<button>").appendTo(h).text("prev").on("click",()=>move(-1));
 $("<button>").appendTo(h).text("next").on("click",()=>move(1));
 const loopOneFlag = rpgen3.addInputBool(h,{
@@ -149,6 +141,15 @@ const loopAllFlag = rpgen3.addInputBool(h,{
 const shuffleFlag = rpgen3.addInputBool(h,{
     title: "シャッフル再生",
     save: "シャッフル再生"
+});
+const inputVolume = rpgen3.addInputRange(h,{
+    title: "音量",
+    save: "音量",
+    min: 0,
+    max: 1,
+    value: 0.5,
+    step: 0.01,
+    change: setVolume
 });
 class Unplayed {
     constructor(){
@@ -347,6 +348,6 @@ function setVolume(){
     switch(whichVideo){
         case YouTube: return yt.setVolume(v * 100);
         case Nico: return postNico({eventName: 'volumeChange', data: { volume: v } });
-        case SoundCloud: return scWidget.setVolume(v);
+        case SoundCloud: return scWidget.setVolume(v * 100);
     }
 }
