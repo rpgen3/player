@@ -18,6 +18,7 @@ https://www.youtube.com/watch?v=ziJLg8UJK7k
 https://www.youtube.com/watch?v=vln2dqj2mIA
 https://www.youtube.com/watch?v=lhUrlIRRlf8
 https://www.youtube.com/watch?v=0WUJSe21Xu8
+https://www.youtube.com/watch?v=QIbrf3BRWHg
 https://www.youtube.com/watch?v=OWSGPu8al50
 https://www.youtube.com/watch?v=OEqKzhKFgwc
 https://www.youtube.com/watch?v=DftsRD02Rj8
@@ -31,7 +32,9 @@ https://www.youtube.com/watch?v=yVeB3rbEoXI
 https://www.youtube.com/watch?v=m__0YOaVPGs
 https://www.youtube.com/watch?v=RXBaywCfRCg
 https://www.youtube.com/watch?v=BxfurKE41Ng
+https://www.youtube.com/watch?v=vij74IBUHs0
 https://www.nicovideo.jp/watch/sm35468261
+https://www.nicovideo.jp/watch/sm34881808
 https://www.nicovideo.jp/watch/sm36632768
 https://www.nicovideo.jp/watch/sm36556444
 https://www.nicovideo.jp/watch/sm37394770
@@ -43,6 +46,8 @@ https://www.nicovideo.jp/watch/sm25300166
 https://www.nicovideo.jp/watch/sm26423064
 https://www.nicovideo.jp/watch/sm25036949
 https://www.nicovideo.jp/watch/sm34050063
+https://www.nicovideo.jp/watch/sm33825049
+https://www.nicovideo.jp/watch/sm35287833
 https://www.nicovideo.jp/watch/sm28313233
 https://www.nicovideo.jp/watch/sm32502855
 https://www.nicovideo.jp/watch/sm25221972
@@ -54,6 +59,8 @@ https://www.nicovideo.jp/watch/sm30987761
 https://www.nicovideo.jp/watch/sm31174338
 https://www.nicovideo.jp/watch/sm30737060
 https://www.nicovideo.jp/watch/sm34245384
+https://api.soundcloud.com/tracks/424792014
+https://api.soundcloud.com/tracks/226588892
 https://api.soundcloud.com/tracks/341606448
 https://api.soundcloud.com/tracks/327497232
 https://api.soundcloud.com/tracks/249841012
@@ -62,6 +69,9 @@ https://api.soundcloud.com/tracks/234819259
 https://api.soundcloud.com/tracks/229482337
 https://api.soundcloud.com/tracks/222359960
 https://api.soundcloud.com/tracks/187656752
+https://api.soundcloud.com/tracks/510464361
+https://api.soundcloud.com/tracks/348170735
+https://api.soundcloud.com/tracks/446541525
 https://api.soundcloud.com/tracks/938004280
 https://api.soundcloud.com/tracks/949592635
 https://api.soundcloud.com/tracks/959069611
