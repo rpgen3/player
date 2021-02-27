@@ -31,8 +31,8 @@ const hItems = $("<div>").appendTo(h).css({
 });
 const ids = [];
 function loadList(){
+    hItems.text("Now Loading...");
     while(ids.length) clearTimeout(ids.pop());
-    hItems.empty();
     g_list = [];
     Promise.all(inputURL().split('\n').filter(v=>v).map(v=>{
         return new Promise(resolve=>{
@@ -41,6 +41,7 @@ function loadList(){
             else resolve(r);
         });
     })).then(result=>{
+        hItems.empty();
         hPlaylist.empty();
         result.filter(v=>v).forEach(v=>{
             if(typeof v[1] === "object") {
