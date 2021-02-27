@@ -33,77 +33,106 @@ const ids = [];
 function loadList(){
     while(ids.length) clearTimeout(ids.pop());
     hItems.empty();
-    g_list = inputURL().split('\n').filter(v=>v).map(judgeURL).filter(v=>v);
-    g_list.forEach((v,i)=>{
-        const h = $("<div>").appendTo(hItems).css({
-            position: "relative",
-            float: "left"
+    g_list = [];
+    Promise.all(inputURL().split('\n').filter(v=>v).map(v=>{
+        return new Promise(resolve=>{
+            const r = judgeURL(v);
+            if(typeof r === "function") r(resolve);
+            else resolve(r);
         });
-        const cover = $("<div>").appendTo(h).addClass("item"),
-              id = v[1],
-              [ tag, url ] = (()=>{
-                  switch(v[0]){
-                      case YouTube: return ["img", `https://i.ytimg.com/vi/${id}/hqdefault.jpg`];
-                      case Nico: return ["iframe", `https://ext.nicovideo.jp/thumb/sm${id}`];
-                      case SoundCloud: {
-                          const p = {
-                              auto_play: false,
-                              show_teaser: false,
-                              visual: true,
-                              buying: false,
-                              liking: false,
-                              download: false,
-                              sharing: false,
-                              show_comments: false,
-                              show_playcount: false,
-                          };
-                          return [
-                              "iframe",
-                              `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&`
-                              + Object.keys(p).map(v=>v+'='+p[v]).join('&')
-                          ];
-                      }
-                  }
-              })();
-        ids.push(setTimeout(()=>{
-            $(`<${tag}>`).prependTo(h).on("load",function(){
-                h.css({
-                    width: $(this).width(),
-                    height: $(this).height()
-                });
-                cover.css({
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    right: 0
-                }).on("click",()=>play(i)).on('contextmenu',()=>{
-                    const idx = inputURL().indexOf(id),
-                          e = $("#inputURL").get(0);
-                    e.focus();
-                    e.setSelectionRange(idx,idx+id.length);
-                    return false;
-                });
-            }).css({
-                maxHeight: 100,
-            }).attr({
-                src: url,
-                scrolling: "no",
-                frameborder: "no"
+    })).then(result=>{
+        hPlaylist.empty();
+        result.filter(v=>v).forEach(v=>{
+            if(typeof v[1] === "object") {
+                for(const v2 of v[1]) g_list.push( [ v[0], v2 ] );
+            }
+            else g_list.push(v);
+        });
+        g_list.forEach((v,i)=>{
+            const h = $("<div>").appendTo(hItems).css({
+                position: "relative",
+                float: "left"
             });
-        },60/130*1000*i));
+            const cover = $("<div>").appendTo(h).addClass("item"),
+                  id = v[1],
+                  [ tag, url ] = (()=>{
+                      switch(v[0]){
+                          case YouTube: return ["img", `https://i.ytimg.com/vi/${id}/hqdefault.jpg`];
+                          case Nico: return ["iframe", `https://ext.nicovideo.jp/thumb/sm${id}`];
+                          case SoundCloud: {
+                              const p = {
+                                  auto_play: false,
+                                  show_teaser: false,
+                                  visual: true,
+                                  buying: false,
+                                  liking: false,
+                                  download: false,
+                                  sharing: false,
+                                  show_comments: false,
+                                  show_playcount: false,
+                              };
+                              return [
+                                  "iframe",
+                                  `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&`
+                                  + Object.keys(p).map(v=>v+'='+p[v]).join('&')
+                              ];
+                          }
+                      }
+                  })();
+            ids.push(setTimeout(()=>{
+                $(`<${tag}>`).prependTo(h).on("load",function(){
+                    h.css({
+                        width: $(this).width(),
+                        height: $(this).height()
+                    });
+                    cover.css({
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        right: 0
+                    }).on("click",()=>play(i)).on('contextmenu',()=>{
+                        const idx = inputURL().indexOf(id),
+                              e = $("#inputURL").get(0);
+                        e.focus();
+                        e.setSelectionRange(idx,idx+id.length);
+                        return false;
+                    });
+                }).css({
+                    maxHeight: 100,
+                }).attr({
+                    src: url,
+                    scrolling: "no",
+                    frameborder: "no"
+                });
+            },60/130*1000*i));
+        });
+        unplayed = prevIdx = null;
+        play(0);
     });
-    unplayed = prevIdx = null;
-    play(0);
+}
+const hPlaylist = $("<div>").appendTo(h).hide();
+function getPlaylist(list,resolve){
+    new YT.Player($("<div>").appendTo(hPlaylist).get(0),{
+        playerVars: {
+            listType: 'playlist',
+            list: list
+        },
+        events: {
+            onReady: e => resolve([ YouTube, e.target.getPlaylist() ])
+        }
+    });
 }
 function judgeURL(url){
     if(!url) return;
-    const d = rpgen3.getDomain(url).reverse();
+    const d = rpgen3.getDomain(url).reverse(),
+          p = rpgen3.getParam(url);
     let m;
     switch(d[1] + '.' + d[0]){
         case "youtu.be":
             m = url.match(/youtu\.be\/([A-Za-z0-9_\-]+)/);
         case "youtube.com":
+            if(p.list) return resolve => getPlaylist(p.list,resolve);
             if(!m) m = url.match(/[\?&]v=([A-Za-z0-9_\-]+)/);
             if(!m) break;
             return [ YouTube, m[1] ];
