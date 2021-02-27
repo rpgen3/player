@@ -279,10 +279,9 @@ const hIframe = $("<div>").appendTo(h),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
 let g_yt,unmutedFlag = false;
-function playYouTube(id) {
-    if(!id) return console.error("YouTube id is empty");
-    g_yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0),{
-        videoId: id,
+function onYouTubeIframeAPIReady() {
+    g_yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0), {
+        //videoId: id,
         playerVars: {
             playsinline: 1,
         },
@@ -298,10 +297,14 @@ function playYouTube(id) {
             onStateChange: e => {
                 console.log(rpgen3.getTime() + ' ' + e.target.getPlayerState());
                 if(e.target.getPlayerState() !== YT.PlayerState.ENDED) return;
-                loopOneFlag() ? g_yt.playVideo() : move(1);
+                loopOneFlag() ? e.target.playVideo() : move(1);
             }
         }
     });
+}
+function playYouTube(id) {
+    if(!id) return console.error("YouTube id is empty");
+    g_yt.loadVideoById(id);
     onResize(iframes[YouTube].find("iframe"));
     showVideo(YouTube);
 }
