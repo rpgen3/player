@@ -289,7 +289,6 @@ function playYouTube(id) {
             },
             events: {
                 onReady: e => {
-                    setVolume();
                     if(isSmartPhone && !unmutedFlag) {
                         unmutedFlag = true;
                         e.target.mute();
@@ -297,6 +296,7 @@ function playYouTube(id) {
                     e.target.playVideo();
                 },
                 onStateChange: e => {
+                    setVolume();
                     if(e.target.getPlayerState() !== YT.PlayerState.ENDED) return;
                     loopOneFlag() ? e.target.playVideo() : move(1);
                 }
@@ -317,10 +317,7 @@ function playNico(id){
         allow: "autoplay"
     }));
     showVideo(Nico);
-    setTimeout(()=>{
-        setVolume();
-        postNico({ eventName: "play" });
-    },3000);
+    setTimeout(()=>postNico({ eventName: "play" }), 3000);
 }
 function postNico(r) {
     iframes[Nico].find("iframe").get(0).contentWindow.postMessage(Object.assign({
@@ -330,6 +327,7 @@ function postNico(r) {
 window.addEventListener('message', e => {
     if (e.origin !== NicoOrigin || e.data.eventName !== 'playerStatusChange') return;
     const { data } = e.data;
+    if(data.playerStatus === 2) setVolume();
     if(data.playerStatus !== 4) return;
     if (!loopOneFlag()) return move(1);
     postNico({
@@ -355,13 +353,13 @@ function playSoundCloud(id){
             allow: "autoplay",
             src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&')
         }).get(0));
-        scWidget.bind(SC.Widget.Events.READY,()=>{
-            setVolume();
-            scWidget.play();
-        });
+        scWidget.bind(SC.Widget.Events.PLAY, setVolume);
         scWidget.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? scWidget.play() : move(1));
     }
-    else scWidget.load(`https://api.soundcloud.com/tracks/${id}`,p);
+    else {
+        scWidget.load(`https://api.soundcloud.com/tracks/${id}`,p);
+        setVolume();
+    }
     onResize(iframes[SoundCloud].find("iframe"));
     showVideo(SoundCloud);
 }
