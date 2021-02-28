@@ -262,7 +262,7 @@ function onResize(elm){
 function resetVideos(){
     hIframe.children().each((i,e)=>$(e).hide());
     if(g_yt) g_yt.stopVideo();
-    postNico({ eventName: 'pause' });
+    iframes[Nico].find("iframe").attr('src','');
     if(scWidget) scWidget.pause();
 }
 let whichVideo;
@@ -362,7 +362,7 @@ function playSoundCloud(id){
         scWidget.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? scWidget.play() : move(1));
     }
     else scWidget.load(`https://api.soundcloud.com/tracks/${id}`,p);
-    onResize(elm);
+    onResize(iframes[SoundCloud].find("iframe"));
     showVideo(SoundCloud);
 }
 let inputVolume;
