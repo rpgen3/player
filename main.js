@@ -341,7 +341,7 @@ let scWidget;
 function playSoundCloud(id){
     if(!id) return console.error("soundcloud id is empty");
     const p = {
-        auto_play: true,
+        auto_play: false,
         show_teaser: false,
         visual: true,
     };
@@ -354,11 +354,12 @@ function playSoundCloud(id){
             src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&')
         }).get(0));
         scWidget.bind(SC.Widget.Events.PLAY, setVolume);
-        scWidget.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? scWidget.play() : move(1));
+        scWidget.bind(SC.Widget.Events.FINISH, ()=>loopOneFlag() ? scWidget.play() : move(1));
     }
     else {
         scWidget.load(`https://api.soundcloud.com/tracks/${id}`,p);
         setVolume();
+        scWidget.play();
     }
     onResize(iframes[SoundCloud].find("iframe"));
     showVideo(SoundCloud);
