@@ -260,7 +260,9 @@ function onResize(elm){
     $(window).off("resize").on("resize",()=>resize(elm)).trigger("resize");
 }
 function resetVideos(){
-    hIframe.children().each((i,e)=>$(e).hide().find("iframe").attr('src',''));
+    hIframe.children().each((i,e)=>$(e).hide());
+    if(g_yt) g_yt.stopVideo();
+    iframes[Nico].find("iframe").attr('src','');
     iframes[SoundCloud].empty();
 }
 let whichVideo;
