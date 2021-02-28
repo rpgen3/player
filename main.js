@@ -260,9 +260,7 @@ function onResize(elm){
     $(window).off("resize").on("resize",()=>resize(elm)).trigger("resize");
 }
 function resetVideos(){
-    hIframe.children().each((i,e)=>$(e).hide());
-    iframes[YouTube].empty();
-    iframes[Nico].find("iframe").attr("src","");
+    hIframe.children().each((i,e)=>$(e).hide().find("iframe").attr('src',''));
     iframes[SoundCloud].empty();
 }
 let whichVideo;
@@ -279,31 +277,31 @@ const hIframe = $("<div>").appendTo(h),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
 let g_yt,unmutedFlag = false;
-function onYouTubeIframeAPIReady() {
-    g_yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0), {
-        playerVars: {
-            playsinline: 1,
-        },
-        events: {
-            onReady: e => {
-                setVolume();
-                if(isSmartPhone && !unmutedFlag) {
-                    unmutedFlag = true;
-                    e.target.mute();
-                }
-                e.target.playVideo();
-            },
-            onStateChange: e => {
-                console.log(rpgen3.getTime() + ' ' + e.target.getPlayerState());
-                if(e.target.getPlayerState() !== YT.PlayerState.ENDED) return;
-                loopOneFlag() ? e.target.playVideo() : move(1);
-            }
-        }
-    });
-}
 function playYouTube(id) {
     if(!id) return console.error("YouTube id is empty");
-    g_yt.loadVideoById(id);
+    if(!g_yt) {
+        g_yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0), {
+            playerVars: {
+                playsinline: 1,
+            },
+            events: {
+                onReady: e => {
+                    setVolume();
+                    if(isSmartPhone && !unmutedFlag) {
+                        unmutedFlag = true;
+                        e.target.mute();
+                    }
+                    e.target.playVideo();
+                },
+                onStateChange: e => {
+                    console.log(rpgen3.getTime() + ' ' + e.target.getPlayerState());
+                    if(e.target.getPlayerState() !== YT.PlayerState.ENDED) return;
+                    loopOneFlag() ? e.target.playVideo() : move(1);
+                }
+            }
+        });
+    }
+    else g_yt.loadVideoById(id);
     onResize(iframes[YouTube].find("iframe"));
     showVideo(YouTube);
 }
