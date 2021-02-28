@@ -281,6 +281,7 @@ function playYouTube(id) {
     if(!id) return console.error("YouTube id is empty");
     if(!g_yt) {
         g_yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0), {
+            videoId: id,
             playerVars: {
                 playsinline: 1,
             },
