@@ -347,7 +347,6 @@ function playSoundCloud(id){
             frameborder: "no",
             playsinline: 1,
             allow: "autoplay",
-            src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&')
         }).get(0));
         scWidget.bind(SC.Widget.Events.READY, load);
         scWidget.bind(SC.Widget.Events.FINISH, ()=>loopOneFlag() ? scWidget.play() : move(1));
