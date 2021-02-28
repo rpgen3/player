@@ -298,7 +298,7 @@ function playYouTube(id) {
                 onStateChange: e => {
                     switch(e.target.getPlayerState()){
                         case YT.PlayerState.PLAYING: return setVolume();
-                        case YT.PlayerState.ENDED: return loopOneFlag() ? e.target.playVideo() : move(1);
+                        case YT.PlayerState.ENDED: return !loopOneFlag() ? move(1) : e.target.playVideo();
                     }
                 }
             }
@@ -328,15 +328,12 @@ function postNico(r) {
 window.addEventListener('message', e => {
     if (e.origin !== NicoOrigin || e.data.eventName !== 'playerStatusChange') return;
     const { data } = e.data;
+    switch(data.playerStatus){
+        case 2: return setVolume();
+        case 4: return;
+    }
     if(data.playerStatus === 2) setVolume();
-    if(data.playerStatus !== 4) return;
-    if (!loopOneFlag()) return move(1);
-    postNico({
-        eventName: 'seek',
-        data: {
-            time: 0
-        }
-    });
+    if(data.playerStatus !== 4) return !loopOneFlag() ? move(1) : postNico({ eventName: 'seek', data: { time: 0 } });
 });
 let scWidget;
 function playSoundCloud(id){
@@ -355,7 +352,7 @@ function playSoundCloud(id){
             src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&')
         }).get(0));
         scWidget.bind(SC.Widget.Events.READY, callback);
-        scWidget.bind(SC.Widget.Events.FINISH, ()=>loopOneFlag() ? scWidget.play() : move(1));
+        scWidget.bind(SC.Widget.Events.FINISH, ()=> !loopOneFlag() ? move(1) : scWidget.play());
     }
     else scWidget.load(`https://api.soundcloud.com/tracks/${id}`, Object.assign(p,{ callback: callback }));
     function callback(){
