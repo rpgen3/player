@@ -133,7 +133,7 @@ function judgeURL(url){
         case "youtu.be":
             m = url.match(/youtu\.be\/([A-Za-z0-9_\-]+)/);
         case "youtube.com":
-            if(p.list) return resolve => getPlaylist(p.list,resolve);
+            if(p.list && /playlist/.test(url)) return resolve => getPlaylist(p.list,resolve);
             if(!m) m = url.match(/[\?&]v=([A-Za-z0-9_\-]+)/);
             if(!m) break;
             return [ YouTube, m[1] ];
