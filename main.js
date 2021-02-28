@@ -262,7 +262,7 @@ function onResize(elm){
 function resetVideos(){
     hIframe.children().each((i,e)=>$(e).hide());
     if(g_yt) g_yt.stopVideo();
-    iframes[Nico].find("iframe").attr('src','');
+    postNico({ eventName: "pause" });
     if(scWidget) scWidget.pause();
 }
 let whichVideo;
@@ -323,7 +323,7 @@ function playNico(id){
     },3000);
 }
 function postNico(r) {
-    hIframe.find("iframe").get(0).contentWindow.postMessage(Object.assign({
+    iframes[Nico].find("iframe").get(0).contentWindow.postMessage(Object.assign({
         sourceConnectorType: 1,
     }, r), NicoOrigin);
 }
