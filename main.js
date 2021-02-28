@@ -327,7 +327,7 @@ function postNico(r) {
 window.addEventListener('message', e => {
     if (e.origin !== NicoOrigin || e.data.eventName !== 'playerStatusChange') return;
     const { data } = e.data;
-    if(data.playerStatus === 2) setVolume();
+    setVolume();
     if(data.playerStatus !== 4) return;
     if (!loopOneFlag()) return move(1);
     postNico({
@@ -353,11 +353,13 @@ function playSoundCloud(id){
             allow: "autoplay",
             src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&')
         }).get(0));
-        scWidget.bind(SC.Widget.Events.PLAY, setVolume);
         scWidget.bind(SC.Widget.Events.FINISH, ()=>loopOneFlag() ? scWidget.play() : move(1));
+        scWidget.bind(SC.Widget.Events.READY, loadCallback);
     }
     else {
-        scWidget.load(`https://api.soundcloud.com/tracks/${id}`,p);
+        scWidget.load(`https://api.soundcloud.com/tracks/${id}`,p,loadCallback);
+    }
+    function loadCallback(){
         setVolume();
         scWidget.play();
     }
