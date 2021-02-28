@@ -297,7 +297,6 @@ function playYouTube(id) {
                     e.target.playVideo();
                 },
                 onStateChange: e => {
-                    console.log(rpgen3.getTime() + ' ' + e.target.getPlayerState());
                     if(e.target.getPlayerState() !== YT.PlayerState.ENDED) return;
                     loopOneFlag() ? e.target.playVideo() : move(1);
                 }
@@ -333,7 +332,6 @@ function postNico(r) {
 window.addEventListener('message', e => {
     if (e.origin !== NicoOrigin || e.data.eventName !== 'playerStatusChange') return;
     const { data } = e.data;
-    console.log(rpgen3.getTime() + ' ' + data.playerStatus);
     if(data.playerStatus !== 4) return;
     if (!loopOneFlag()) return move(1);
     postNico({
