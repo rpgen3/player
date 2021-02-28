@@ -281,7 +281,6 @@ const hIframe = $("<div>").appendTo(h),
 let g_yt,unmutedFlag = false;
 function onYouTubeIframeAPIReady() {
     g_yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0), {
-        //videoId: id,
         playerVars: {
             playsinline: 1,
         },
