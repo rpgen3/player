@@ -262,8 +262,8 @@ function onResize(elm){
 function resetVideos(){
     hIframe.children().each((i,e)=>$(e).hide());
     if(g_yt) g_yt.stopVideo();
-    iframes[Nico].find("iframe").attr('src','');
-    iframes[SoundCloud].empty();
+    postNico({ eventName: 'pause' });
+    if(scWidget) scWidget.pause();
 }
 let whichVideo;
 function showVideo(videoType){
@@ -275,7 +275,7 @@ const hIframe = $("<div>").appendTo(h),
       iframes = [
           $("<div>").appendTo(hIframe).hide(),
           $("<div>").appendTo(hIframe).hide().append("<iframe>"),
-          $("<div>").appendTo(hIframe).hide(),
+          $("<div>").appendTo(hIframe).hide().append("<iframe>"),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
 let g_yt,unmutedFlag = false;
@@ -319,9 +319,7 @@ function playNico(id){
     showVideo(Nico);
     setTimeout(()=>{
         setVolume();
-        postNico({
-            eventName: "play"
-        });
+        postNico({ eventName: "play" });
     },3000);
 }
 function postNico(r) {
@@ -349,21 +347,23 @@ function playSoundCloud(id){
         show_teaser: false,
         visual: true,
     };
-    const elm = $("<iframe>").appendTo(iframes[SoundCloud]).attr({
-        scrolling: "no",
-        frameborder: "no",
-        playsinline: 1,
-        allow: "autoplay",
-        src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&')
-    });
+    if(!scWidget){
+        scWidget = SC.Widget(iframes[SoundCloud].find("iframe").attr({
+            scrolling: "no",
+            frameborder: "no",
+            playsinline: 1,
+            allow: "autoplay",
+            src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&')
+        }).get(0));
+        scWidget.bind(SC.Widget.Events.READY,()=>{
+            setVolume();
+            scWidget.play();
+        });
+        scWidget.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? scWidget.play() : move(1));
+    }
+    else scWidget.load(`https://api.soundcloud.com/tracks/${id}`,p);
     onResize(elm);
     showVideo(SoundCloud);
-    scWidget = SC.Widget(elm.get(0));
-    scWidget.bind(SC.Widget.Events.READY,()=>{
-        setVolume();
-        scWidget.play();
-    });
-    scWidget.bind(SC.Widget.Events.FINISH,()=>loopOneFlag() ? scWidget.play() : move(1));
 }
 let inputVolume;
 function makeInputVolume(){
