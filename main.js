@@ -296,9 +296,10 @@ function playYouTube(id) {
                     e.target.playVideo();
                 },
                 onStateChange: e => {
-                    setVolume();
-                    if(e.target.getPlayerState() !== YT.PlayerState.ENDED) return;
-                    loopOneFlag() ? e.target.playVideo() : move(1);
+                    switch(e.target.getPlayerState()){
+                        case YT.PlayerState.PLAYING: return setVolume();
+                        case YT.PlayerState.ENDED: return loopOneFlag() ? e.target.playVideo() : move(1);
+                    }
                 }
             }
         });
@@ -327,7 +328,7 @@ function postNico(r) {
 window.addEventListener('message', e => {
     if (e.origin !== NicoOrigin || e.data.eventName !== 'playerStatusChange') return;
     const { data } = e.data;
-    setVolume();
+    if(data.playerStatus === 2) setVolume();
     if(data.playerStatus !== 4) return;
     if (!loopOneFlag()) return move(1);
     postNico({
@@ -340,11 +341,6 @@ window.addEventListener('message', e => {
 let scWidget;
 function playSoundCloud(id){
     if(!id) return console.error("soundcloud id is empty");
-    const p = {
-        auto_play: false,
-        show_teaser: false,
-        visual: true,
-    };
     if(!scWidget){
         scWidget = SC.Widget(iframes[SoundCloud].find("iframe").attr({
             scrolling: "no",
@@ -354,14 +350,19 @@ function playSoundCloud(id){
             src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&')
         }).get(0));
         scWidget.bind(SC.Widget.Events.FINISH, ()=>loopOneFlag() ? scWidget.play() : move(1));
-        scWidget.bind(SC.Widget.Events.READY, loadCallback);
+        scWidget.bind(SC.Widget.Events.READY, load);
     }
-    else {
-        scWidget.load(`https://api.soundcloud.com/tracks/${id}`,p,loadCallback);
-    }
-    function loadCallback(){
-        setVolume();
-        scWidget.play();
+    else load();
+    function load(){
+        scWidget.load(`https://api.soundcloud.com/tracks/${id}`,{
+            auto_play: false,
+            show_teaser: false,
+            visual: true,
+            callback: () => {
+                setVolume();
+                scWidget.play();
+            }
+        });
     }
     onResize(iframes[SoundCloud].find("iframe"));
     showVideo(SoundCloud);
