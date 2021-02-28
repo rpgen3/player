@@ -330,10 +330,8 @@ window.addEventListener('message', e => {
     const { data } = e.data;
     switch(data.playerStatus){
         case 2: return setVolume();
-        case 4: return;
+        case 4: return !loopOneFlag() ? move(1) : postNico({ eventName: 'seek', data: { time: 0 } });
     }
-    if(data.playerStatus === 2) setVolume();
-    if(data.playerStatus !== 4) return !loopOneFlag() ? move(1) : postNico({ eventName: 'seek', data: { time: 0 } });
 });
 let scWidget;
 function playSoundCloud(id){
