@@ -86,6 +86,10 @@ https://api.soundcloud.com/tracks/938004280
 https://api.soundcloud.com/tracks/949592635
 https://api.soundcloud.com/tracks/959069611
 https://api.soundcloud.com/tracks/767900131
+https://api.soundcloud.com/tracks/920949316
+https://api.soundcloud.com/tracks/814727170
+https://api.soundcloud.com/tracks/892926649
+https://api.soundcloud.com/tracks/979436653
 https://api.soundcloud.com/tracks/953772931
 https://api.soundcloud.com/tracks/926618062
 https://api.soundcloud.com/tracks/891483493
