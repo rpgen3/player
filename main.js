@@ -335,9 +335,7 @@ function postNico(r) {
         sourceConnectorType: 1,
     }, r), NicoOrigin);
 }
-window.aaa=postNico;
 window.addEventListener('message', e => {
-    return;
     if (e.origin !== NicoOrigin || e.data.eventName !== 'playerStatusChange') return;
     const { data } = e.data;
     switch(data.playerStatus){
