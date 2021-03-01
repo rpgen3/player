@@ -218,20 +218,18 @@ function next(){
 }
 const played = [];
 function prev(){
-    let id = played.pop();
-    while(id === g_idx && played.length){
-        id = played.pop();
-    }
-    if(!isNaN(id)) start(id, true);
-    else alert("It is the beginning.");
+    if(played.length === 1) return alert("It is the beginning.");
+    played.pop();
+    start(played[played.length - 1]);
 }
-function start(id, prevFlag){
-    if(!prevFlag) played.push(id);
-    g_idx = id;
+function start(id){
+    const topId = played[played.length - 1];
+    if(id !== topId) played.push(id);
     if(unplayed) unplayed.exclude(id);
+    g_idx = id;
     setActive(id);
     const r = g_list[id];
-    resetVideos(whichVideo,r[0]);
+    resetVideos(r[0]);
     (()=>{
         switch(r[0]){
             case YouTube: return playYouTube;
@@ -269,8 +267,8 @@ function resize(elm){
 function onResize(elm){
     $(window).off("resize").on("resize",()=>resize(elm)).trigger("resize");
 }
-function resetVideos(prev,next){
-    if(prev === next) return;
+function resetVideos(next){
+    if(whichVideo === next) return;
     hIframe.children().each((i,e)=>$(e).hide());
     pause();
 }
