@@ -29,6 +29,13 @@ const hItems = $("<div>").appendTo(h).css({
     overflowY: "scroll",
     maxHeight: "40vh",
 });
+(()=>{
+    const LONGPRESS = 1000;
+    let id;
+    $(window).on("mousedown touchstart",e=>{
+        id = setTimeout(()=>$(e.target).trigger('longpress'), LONGPRESS);
+    }).on("mouseup mouseleave touchend",()=>clearTimeout(id));
+})();
 const ids = [];
 function loadList(){
     hItems.text("Now Loading...");
@@ -92,7 +99,7 @@ function loadList(){
                         left: 0,
                         bottom: 0,
                         right: 0
-                    }).on("click",()=>play(i)).on('contextmenu',()=>{
+                    }).on("click",()=>start(i)).on('contextmenu longpress',()=>{
                         const idx = inputURL().indexOf(id),
                               e = $("#inputURL").get(0);
                         e.focus();
@@ -109,7 +116,8 @@ function loadList(){
             },60/130*1000*i));
         });
         unplayed = prevIdx = null;
-        play(0);
+        while(played.length) played.pop();
+        start(0);
     });
 }
 const hPlaylist = $("<div>").appendTo(h).hide();
@@ -156,20 +164,18 @@ function setActive(i){
     $(".item").eq(i).addClass("active");
 }
 h.append("<br>");
-$("<button>").appendTo(h).text("prev").on("click",()=>move(-1));
-$("<button>").appendTo(h).text("next").on("click",()=>move(1));
-const loopOneFlag = rpgen3.addInputBool(h,{
-    title: "1曲リピート",
-    save: "1曲リピート"
-});
-const loopAllFlag = rpgen3.addInputBool(h,{
-    title: "全曲リピート",
-    save: "全曲リピート"
+$("<button>").appendTo(h).text("prev").on("click",prev);
+$("<button>").appendTo(h).text("next").on("click",next);
+const repeatPlayFlag = rpgen3.addInputBool(h,{
+    title: "リピート再生",
+    save: "リピート再生"
 });
 const shuffleFlag = rpgen3.addInputBool(h,{
     title: "シャッフル再生",
     save: "シャッフル再生"
 });
+$("<button>").appendTo(h).text("再生").on("click",play);
+$("<button>").appendTo(h).text("一時停止").on("click",pause);
 const hInputVolume = $("<div>").appendTo(h);
 class Unplayed {
     constructor(){
@@ -193,13 +199,12 @@ function getRandom(){
     }
     const result = unplayed.random();
     if(false === result) {
-        if(!loopAllFlag()) return false;
         unplayed = new Unplayed();
         return getRandom();
     }
     return result;
 }
-function move(n){
+function next(){
     let i = g_idx;
     if(shuffleFlag()){
         const result = getRandom();
@@ -207,21 +212,22 @@ function move(n){
         i = result;
     }
     else {
-        i += n;
-        if(0 > i) i = loopAllFlag() ? g_list.length - 1 : 0;
-        else if(g_list.length - 1 < i) {
-            if(!loopAllFlag()) return (i = g_list.length - 1);
-            i = 0;
-        }
+        if(++i > g_list.length - 1) i = 0;
     }
-    play(i);
+    start(i);
 }
-function play(n){
-    g_idx = n;
-    resetVideos();
-    setActive(n);
-    if(unplayed) unplayed.exclude(n);
-    const r = g_list[n];
+const played = [];
+function prev(){
+    if(played.length) start(played.pop(), true);
+    else alert("It is the beginning.");
+}
+function start(id, prevFlag){
+    if(!prevFlag) played.push(id);
+    g_idx = id;
+    if(unplayed) unplayed.exclude(id);
+    setActive(id);
+    const r = g_list[id];
+    resetVideos(whichVideo,r[0]);
     (()=>{
         switch(r[0]){
             case YouTube: return playYouTube;
@@ -259,11 +265,10 @@ function resize(elm){
 function onResize(elm){
     $(window).off("resize").on("resize",()=>resize(elm)).trigger("resize");
 }
-function resetVideos(){
+function resetVideos(prev,next){
+    if(prev === next) return;
     hIframe.children().each((i,e)=>$(e).hide());
-    if(g_yt) g_yt.stopVideo();
-    postNico({ eventName: "pause" });
-    if(scWidget) scWidget.pause();
+    pause();
 }
 let whichVideo;
 function showVideo(videoType){
@@ -278,6 +283,7 @@ const hIframe = $("<div>").appendTo(h),
           $("<div>").appendTo(hIframe).hide().append("<iframe>"),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
+const playerEnded = () => repeatPlayFlag() ? play() : next();
 let g_yt,unmutedFlag = false;
 function playYouTube(id) {
     if(!id) return console.error("YouTube id is empty");
@@ -293,12 +299,12 @@ function playYouTube(id) {
                         unmutedFlag = true;
                         e.target.mute();
                     }
-                    e.target.playVideo();
+                    play();
                 },
                 onStateChange: e => {
                     switch(e.target.getPlayerState()){
                         case YT.PlayerState.PLAYING: return setVolume();
-                        case YT.PlayerState.ENDED: return !loopOneFlag() ? move(1) : e.target.playVideo();
+                        case YT.PlayerState.ENDED: return playerEnded();
                     }
                 }
             }
@@ -318,19 +324,21 @@ function playNico(id){
         allow: "autoplay"
     }));
     showVideo(Nico);
-    setTimeout(()=>postNico({ eventName: "play" }), 3000);
+    setTimeout(play, 3000);
 }
 function postNico(r) {
     iframes[Nico].find("iframe").get(0).contentWindow.postMessage(Object.assign({
         sourceConnectorType: 1,
     }, r), NicoOrigin);
 }
+window.aaa=postNico;
 window.addEventListener('message', e => {
+    return;
     if (e.origin !== NicoOrigin || e.data.eventName !== 'playerStatusChange') return;
     const { data } = e.data;
     switch(data.playerStatus){
         case 2: return setVolume();
-        case 4: return !loopOneFlag() ? move(1) : postNico({ eventName: 'seek', data: { time: 0 } });
+        case 4: return playerEnded();
     }
 });
 let scWidget;
@@ -350,12 +358,12 @@ function playSoundCloud(id){
             src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&')
         }).get(0));
         scWidget.bind(SC.Widget.Events.READY, callback);
-        scWidget.bind(SC.Widget.Events.FINISH, ()=> !loopOneFlag() ? move(1) : scWidget.play());
+        scWidget.bind(SC.Widget.Events.FINISH, playerEnded);
     }
     else scWidget.load(`https://api.soundcloud.com/tracks/${id}`, Object.assign(p,{ callback: callback }));
     function callback(){
         setVolume();
-        scWidget.play();
+        play();
     }
     onResize(iframes[SoundCloud].find("iframe"));
     showVideo(SoundCloud);
@@ -387,5 +395,19 @@ function setVolume(){
         case YouTube: return g_yt.setVolume(v * 100);
         case Nico: return postNico({eventName: 'volumeChange', data: { volume: v } });
         case SoundCloud: return scWidget.setVolume(v * 100);
+    }
+}
+function pause(){
+    switch(whichVideo){
+        case YouTube: return g_yt.pauseVideo();
+        case Nico: return postNico({ eventName: "pause" });
+        case SoundCloud: return scWidget.pause();
+    }
+}
+function play(){
+    switch(whichVideo){
+        case YouTube: return g_yt.playVideo();
+        case Nico: return postNico({ eventName: "play" });
+        case SoundCloud: return scWidget.play();
     }
 }
