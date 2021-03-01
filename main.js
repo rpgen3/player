@@ -19,7 +19,9 @@ $.get(`sample.txt`,r=>{
         id: "inputURL",
         textarea: true,
         save:  "動画URLリスト入力欄",
-        placeholder: "YouTubeとニコニコ動画とSoundCloudのURL\nSoundCloudは埋め込みURLじゃないと使えないので注意",
+        placeholder: `YouTubeとニコニコ動画とSoundCloudのURL
+YouTubeのみplaylistも可
+SoundCloudは埋め込みURLじゃないと使えないので注意`,
         value: r
     });
 });
