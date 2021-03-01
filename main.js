@@ -218,7 +218,11 @@ function next(){
 }
 const played = [];
 function prev(){
-    if(played.length) start(played.pop(), true);
+    let id = played.pop();
+    while(id === g_idx && played.length){
+        id = played.pop();
+    }
+    if(!isNaN(id)) start(id, true);
     else alert("It is the beginning.");
 }
 function start(id, prevFlag){
