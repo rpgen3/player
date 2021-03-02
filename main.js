@@ -9,7 +9,7 @@ const h = $("<div>").appendTo($("body")).css({
     padding: "1em"
 });
 $("<h2>",{text:"YouTube Nicovideo SoundCloud Player"}).appendTo(h);
-rpgen3.addHideArea(h,{
+const isShowingHideArea = rpgen3.addHideArea(h,{
     title: "動画URLリスト入力欄",
     id2: "hideArea"
 });
@@ -111,6 +111,7 @@ function loadList(){
                         bottom: 0,
                         right: 0
                     }).on("click",()=>start(i)).on('contextmenu longpress',()=>{
+                        if(!isShowingHideArea()) return false;
                         const idx = inputURL().indexOf(id),
                               e = $("#inputURL").get(0);
                         e.focus();
