@@ -32,9 +32,9 @@ rpgen3.addHideArea(h,{
     id2: "area2"
 });
 const isAllowedToLoad = [
-    rpgen3.addInputBool("area2",{ title: "YouTube", value: true }),
-    rpgen3.addInputBool("area2",{ title: "ニコニコ動画", value: true }),
-    rpgen3.addInputBool("area2",{ title: "SoundCloud", value: true }),
+    rpgen3.addInputBool("#area2",{ title: "YouTube", value: true }),
+    rpgen3.addInputBool("#area2",{ title: "ニコニコ動画", value: true }),
+    rpgen3.addInputBool("#area2",{ title: "SoundCloud", value: true }),
 ];
 const hItems = $("<div>").appendTo(h).css({
     overflowY: "scroll",
@@ -190,7 +190,7 @@ const shuffleFlag = rpgen3.addInputBool(h,{
 });
 $("<button>").appendTo(h).text("再生").on("click",play);
 $("<button>").appendTo(h).text("一時停止").on("click",pause);
-$("<button>").appendTo(h).text("リプレイ").on("click",replay);
+$("<button>").appendTo(h).text("replay").on("click",replay);
 const hInputVolume = $("<div>").appendTo(h);
 class Unplayed {
     constructor(){
