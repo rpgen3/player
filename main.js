@@ -191,7 +191,7 @@ const shuffleFlag = rpgen3.addInputBool(h,{
 });
 $("<button>").appendTo(h).text("再生").on("click",play);
 $("<button>").appendTo(h).text("一時停止").on("click",pause);
-$("<button>").appendTo(h).text("replay").on("click",replay);
+$("<button>").appendTo(h).text("リプレイ").on("click",replay);
 const hInputVolume = $("<div>").appendTo(h);
 class Unplayed {
     constructor(){
