@@ -27,6 +27,15 @@ SoundCloudは埋め込みURLじゃないと使えないので注意`,
 });
 h.append("<br>");
 $("<button>").appendTo(h).text("リストを読み込む").on("click",loadList);
+rpgen3.addHideArea(h,{
+    title: "読み込み設定",
+    id2: "area2"
+});
+const isAllowedToLoad = [
+    rpgen3.addInputBool("area2",{ title: "YouTube", value: true }),
+    rpgen3.addInputBool("area2",{ title: "ニコニコ動画", value: true }),
+    rpgen3.addInputBool("area2",{ title: "SoundCloud", value: true }),
+];
 const hItems = $("<div>").appendTo(h).css({
     overflowY: "scroll",
     maxHeight: "40vh",
@@ -143,16 +152,19 @@ function judgeURL(url){
         case "youtu.be":
             m = url.match(/youtu\.be\/([A-Za-z0-9_\-]+)/);
         case "youtube.com":
+            if(!(isAllowedToLoad[YouTube]())) return;
             if(p.list && /playlist/.test(url)) return resolve => getPlaylist(p.list,resolve);
             if(!m) m = url.match(/[\?&]v=([A-Za-z0-9_\-]+)/);
             if(!m) break;
             return [ YouTube, m[1] ];
         case "nicovideo.jp":
         case "nico.ms":
+            if(!(isAllowedToLoad[Nico]())) return;
             m = url.match(/sm([0-9]+)/);
             if(!m) break;
             return [ Nico, m[1] ];
         case "soundcloud.com":
+            if(!(isAllowedToLoad[SoundCloud]())) return;
             m = url.match(/\/tracks\/([0-9]+)/);
             if(!m) break;
             return [ SoundCloud, m[1] ];
@@ -178,6 +190,7 @@ const shuffleFlag = rpgen3.addInputBool(h,{
 });
 $("<button>").appendTo(h).text("再生").on("click",play);
 $("<button>").appendTo(h).text("一時停止").on("click",pause);
+$("<button>").appendTo(h).text("replay").on("click",replay);
 const hInputVolume = $("<div>").appendTo(h);
 class Unplayed {
     constructor(){
@@ -220,7 +233,7 @@ function next(){
 }
 const played = [];
 function prev(){
-    if(played.length === 1) return alert("It is the beginning.");
+    if(played.length === 1) return alert("This is the first track.");
     played.pop();
     start(played[played.length - 1]);
 }
@@ -399,6 +412,13 @@ function setVolume(){
         case SoundCloud: return scWidget.setVolume(v * 100);
     }
 }
+function play(){
+    switch(whichVideo){
+        case YouTube: return g_yt.playVideo();
+        case Nico: return postNico({ eventName: "play" });
+        case SoundCloud: return scWidget.play();
+    }
+}
 function pause(){
     switch(whichVideo){
         case YouTube: return g_yt.pauseVideo();
@@ -406,10 +426,10 @@ function pause(){
         case SoundCloud: return scWidget.pause();
     }
 }
-function play(){
+function replay(){
     switch(whichVideo){
-        case YouTube: return g_yt.playVideo();
-        case Nico: return postNico({ eventName: "play" });
-        case SoundCloud: return scWidget.play();
+        case YouTube: return g_yt.seekTo(0);
+        case Nico: return postNico({ eventName: "seek", data: { time: 0 } });
+        case SoundCloud: return scWidget.seekTo(0);
     }
 }
