@@ -36,6 +36,13 @@ const isAllowedToLoad = [
     rpgen3.addInputBool("#area2",{ title: "ニコニコ動画", value: true }),
     rpgen3.addInputBool("#area2",{ title: "SoundCloud", value: true }),
 ];
+const hMsg = $("<div>").appendTo(h);
+function msg(str, isError){
+    $("<span>").appendTo(hMsg.empty()).text(str).css({
+        color: isError ? "red" : "black",
+        backgroundColor: isError ? "pink" : "white",
+    });
+}
 const hItems = $("<div>").appendTo(h).css({
     overflowY: "scroll",
     maxHeight: "40vh",
@@ -49,7 +56,7 @@ const hItems = $("<div>").appendTo(h).css({
 })();
 const ids = [];
 function loadList(){
-    hItems.text("Now Loading...");
+    msg("Now Loading...");
     while(ids.length) clearTimeout(ids.pop());
     Promise.all(inputURL().split('\n').filter(v=>v).map(url=>{
         return new Promise((resolve, reject)=>{
@@ -102,6 +109,7 @@ function loadList(){
                   })();
             ids.push(setTimeout(()=>{
                 $(`<${tag}>`).prependTo(h).on("load",function(){
+                    msg(`読み込み完了(${i}/${g_list.length})`);
                     h.css({
                         width: $(this).width(),
                         height: $(this).height()
@@ -132,7 +140,7 @@ function loadList(){
         unplayed = prevIdx = null;
         while(played.length) played.pop();
         start(0);
-    }).catch(err=>hItems.text(err));
+    }).catch(err=>msg(err,true));
 }
 const hPlaylist = $("<div>").appendTo(h).hide();
 function getPlaylist(resolve, list){
