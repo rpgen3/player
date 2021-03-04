@@ -20,8 +20,9 @@ $.get(`sample.txt`,r=>{
         textarea: true,
         save:  "動画URLリスト入力欄",
         placeholder: `YouTubeとニコニコ動画とSoundCloudのURL
-YouTubeのみplaylistも可
-SoundCloudは埋め込みURLじゃないと使えないので注意`,
+SoundCloudは埋め込みURLじゃないと使えないので注意
+YouTubeとSoundCloudはplaylistも可
+YouTubeチャンネルのURLも可`,
         value: r
     });
 });
@@ -170,16 +171,22 @@ function loadList(){
     }
 }
 const hHideArea = $("<div>").appendTo(h).hide();
-function getPlaylist(resolve, list){
+function getPlaylistYT(resolve, listType, list){
     new YT.Player($("<div>").appendTo(hHideArea).get(0),{
         playerVars: {
-            listType: 'playlist',
+            listType: listType,
             list: list
         },
         events: {
-            onReady: e => resolve([ YouTube, e.target.getPlaylist() ]),
+            onReady: e => resolve([ YouTube, e.target.getPlaylistYT() ]),
         }
     });
+}
+function getPlaylistSC(resolve, id){
+    const w = SC.Widget($("<iframe>").appendTo(hHideArea).attr({
+        src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/${id}`
+    }).get(0));
+    w.bind(SC.Widget.Events.READY, () => w.getSounds(r=>resolve([ SoundCloud, r.map(v=>v.id) ])));
 }
 function judgeURL(url){
     if(!url) return;
@@ -191,21 +198,27 @@ function judgeURL(url){
             m = url.match(/youtu\.be\/([A-Za-z0-9_\-]+)/);
         case "youtube.com":
             if(!(isAllowedToLoad[YouTube]())) return;
-            if(p.list && /playlist/.test(url)) return resolve => getPlaylist(resolve, p.list);
+            if(p.list && /playlist/.test(url)) return resolve => getPlaylistYT(resolve, 'playlist', p.list);
+            if(/user/.test(url)) {
+                m = url.match(/user\/([A-Za-z0-9_\-]+)/);
+                if(m) return resolve => getPlaylistYT(resolve, 'user_uploads', m[1]);
+            }
+            // if(p.search_query) return resolve => getPlaylistYT(resolve, 'search', p.search_query);
             if(!m) m = url.match(/[\?&]v=([A-Za-z0-9_\-]+)/);
-            if(!m) break;
-            return [ YouTube, m[1] ];
+            if(m) return [ YouTube, m[1] ];
         case "nicovideo.jp":
         case "nico.ms":
             if(!(isAllowedToLoad[Nico]())) return;
             m = url.match(/sm([0-9]+)/);
-            if(!m) break;
-            return [ Nico, m[1] ];
+            if(m) return [ Nico, m[1] ];
         case "soundcloud.com":
             if(!(isAllowedToLoad[SoundCloud]())) return;
+            if(/playlists/.test(url)) {
+                m = url.match(/playlists\/([0-9]+)/);
+                if(m) return resolve => getPlaylistSC(resolve, m[1]);
+            }
             m = url.match(/\/tracks\/([0-9]+)/);
-            if(!m) break;
-            return [ SoundCloud, m[1] ];
+            if(m) return [ SoundCloud, m[1] ];
     }
     return console.error("this url is not supported\n" + url);
 }
@@ -228,7 +241,7 @@ const shuffleFlag = rpgen3.addInputBool(h,{
 });
 $("<button>").appendTo(h).text("再生").on("click",play);
 $("<button>").appendTo(h).text("一時停止").on("click",pause);
-$("<button>").appendTo(h).text("リプレイ").on("click",replay);
+$("<button>").appendTo(h).text("最初から").on("click",seekTo0);
 const hInputVolume = $("<div>").appendTo(h);
 class Unplayed {
     constructor(){
@@ -465,7 +478,7 @@ function pause(){
         case SoundCloud: return scWidget.pause();
     }
 }
-function replay(){
+function seekTo0(){
     switch(whichVideo){
         case YouTube: return g_yt.seekTo(0);
         case Nico: return postNico({ eventName: "seek", data: { time: 0 } });
