@@ -203,7 +203,7 @@ function judgeURL(url){
                 m = url.match(/user\/([A-Za-z0-9_\-]+)/);
                 if(m) return resolve => getPlaylistYT(resolve, 'user_uploads', m[1]);
             }
-            if(p.search_query) return resolve => getPlaylistYT(resolve, 'search', p.search_query);
+            // if(p.search_query) return resolve => getPlaylistYT(resolve, 'search', p.search_query);
             if(!m) m = url.match(/[\?&]v=([A-Za-z0-9_\-]+)/);
             if(m) return [ YouTube, m[1] ];
         case "nicovideo.jp":
