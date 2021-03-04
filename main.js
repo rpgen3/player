@@ -67,7 +67,7 @@ function loadList(){
     })).then(result=>{
         const list = result.filter(v=>v);
         hPlaylist.empty();
-        if(!list.every(v=>v[1])) throw Error("プレイリストの読み込みに失敗しました");
+        if(!list.every(v=>v[1])) throw Error("Failed to load playlist");
         hItems.empty();
         g_list = [];
         list.forEach(v=>{
@@ -109,7 +109,7 @@ function loadList(){
                   })();
             ids.push(setTimeout(()=>{
                 $(`<${tag}>`).prependTo(h).on("load",function(){
-                    msg(`読み込み完了(${i}/${g_list.length})`);
+                    msg(`Loaded (${i}/${g_list.length})`);
                     h.css({
                         width: $(this).width(),
                         height: $(this).height()
