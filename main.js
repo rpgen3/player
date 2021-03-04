@@ -54,23 +54,17 @@ function loadList(){
     Promise.all(inputURL().split('\n').filter(v=>v).map(url=>{
         return new Promise((resolve, reject)=>{
             const r = judgeURL(url);
-            if(typeof r === "function") r(resolve, reject, url);
+            if(typeof r === "function") r(resolve);
             else resolve(r);
         });
-    })).catch(err=>{
-        hItems.empty();
-        err.split('\n').forEach(v=>$("<div>").appendTo(hItems).text(v).css({
-            color: "red",
-            backgroundColor: "pink"
-        }));
-        return false;
-    }).then(result=>{
+    })).then(result=>{
         hPlaylist.empty();
         if(!result) return;
         hItems.empty();
         g_list = [];
         result.filter(v=>v).forEach(v=>{
             if(typeof v[1] === "object") {
+                if(!v[1]) throw Error("プレイリストの読み込みに失敗しました");
                 for(const v2 of v[1]) g_list.push( [ v[0], v2 ] );
             }
             else g_list.push(v);
@@ -138,10 +132,10 @@ function loadList(){
         unplayed = prevIdx = null;
         while(played.length) played.pop();
         start(0);
-    });
+    }).catch(err=>hItems.text(err));
 }
 const hPlaylist = $("<div>").appendTo(h).hide();
-function getPlaylist(resolve, reject, url, list){
+function getPlaylist(resolve, list){
     new YT.Player($("<div>").appendTo(hPlaylist).get(0),{
         playerVars: {
             listType: 'playlist',
@@ -149,7 +143,6 @@ function getPlaylist(resolve, reject, url, list){
         },
         events: {
             onReady: e => resolve([ YouTube, e.target.getPlaylist() ]),
-            onError: e => reject("エラー\n下記のプレイリストが読み込めません\n" + url)
         }
     });
 }
@@ -163,7 +156,7 @@ function judgeURL(url){
             m = url.match(/youtu\.be\/([A-Za-z0-9_\-]+)/);
         case "youtube.com":
             if(!(isAllowedToLoad[YouTube]())) return;
-            if(p.list && /playlist/.test(url)) return (resolve, reject, url) => getPlaylist(resolve, reject, url, p.list);
+            if(p.list && /playlist/.test(url)) return resolve => getPlaylist(resolve, p.list);
             if(!m) m = url.match(/[\?&]v=([A-Za-z0-9_\-]+)/);
             if(!m) break;
             return [ YouTube, m[1] ];
