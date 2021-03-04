@@ -189,7 +189,7 @@ function setActive(i){
     $(".item").eq(i).addClass("active");
 }
 h.append("<br>");
-$("<button>").appendTo(h).text("prev").on("click",prev);
+const prevBtn = $("<button>").appendTo(h).text("prev").on("click",prev);
 $("<button>").appendTo(h).text("next").on("click",next);
 const repeatPlayFlag = rpgen3.addInputBool(h,{
     title: "リピート再生",
@@ -249,6 +249,7 @@ function prev(){
     start(played[played.length - 1]);
 }
 function start(id){
+    prevBtn[played.length > 1 ? "show" : "hide"]();
     const topId = played[played.length - 1];
     if(id !== topId) played.push(id);
     if(unplayed) unplayed.exclude(id);
