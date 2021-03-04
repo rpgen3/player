@@ -54,10 +54,11 @@ const hItems = $("<div>").appendTo(h).css({
         id = setTimeout(()=>$(e.target).trigger('longpress'), LONGPRESS);
     }).on("mouseup mouseleave touchend",()=>clearTimeout(id));
 })();
-const ids = [];
+let g_timeStamp = 0;
 function loadList(){
+    const timeStamp = +new Date;
+    g_timeStamp = timeStamp;
     msg("Now Loading...");
-    while(ids.length) clearTimeout(ids.pop());
     Promise.all(inputURL().split('\n').filter(v=>v).map(url=>{
         return new Promise((resolve, reject)=>{
             const r = judgeURL(url);
@@ -66,7 +67,6 @@ function loadList(){
         });
     })).then(result=>{
         const list = result.filter(v=>v);
-        hPlaylist.empty();
         if(!list.every(v=>v[1])) throw Error("Failed to load playlist");
         hItems.empty();
         g_list = [];
@@ -76,76 +76,102 @@ function loadList(){
             }
             else g_list.push(v);
         });
-        let loadedCount = 0;
-        g_list.forEach((v,i)=>{
+        const funcList = g_list.map((v,i)=>{
             const h = $("<div>").appendTo(hItems).css({
                 position: "relative",
                 float: "left"
             });
             const cover = $("<div>").appendTo(h).addClass("item"),
-                  id = v[1],
-                  [ tag, url ] = (()=>{
-                      switch(v[0]){
-                          case YouTube: return ["img", `https://i.ytimg.com/vi/${id}/hqdefault.jpg`];
-                          case Nico: return ["iframe", `https://ext.nicovideo.jp/thumb/sm${id}`];
-                          case SoundCloud: {
-                              const p = {
-                                  auto_play: false,
-                                  show_teaser: false,
-                                  visual: true,
-                                  buying: false,
-                                  liking: false,
-                                  download: false,
-                                  sharing: false,
-                                  show_comments: false,
-                                  show_playcount: false,
-                              };
-                              return [
-                                  "iframe",
-                                  `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&`
-                                  + Object.keys(p).map(v=>v+'='+p[v]).join('&')
-                              ];
-                          }
-                      }
-                  })();
-            ids.push(setTimeout(()=>{
-                $(`<${tag}>`).prependTo(h).on("load",function(){
-                    msg(`Loaded (${++loadedCount}/${g_list.length})`);
-                    h.css({
-                        width: $(this).width(),
-                        height: $(this).height()
-                    });
-                    cover.css({
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        bottom: 0,
-                        right: 0
-                    }).on("click",()=>start(i)).on('contextmenu longpress',()=>{
-                        if(!isShowingHideArea()) return false;
-                        const idx = inputURL().indexOf(id),
-                              e = $("#inputURL").get(0);
-                        e.focus();
-                        e.setSelectionRange(idx,idx+id.length);
-                        return false;
-                    });
-                }).css({
-                    maxHeight: 100,
-                }).attr({
-                    src: url,
-                    scrolling: "no",
-                    frameborder: "no"
-                });
-            },60/130*1000*i));
+                  id = v[1];
+            return () => loadItem({v,i,id,cover,funcList,h});
         });
+        funcList[0]();
         unplayed = prevIdx = null;
         while(played.length) played.pop();
         start(0);
     }).catch(err=>msg(err,true));
+    function loadItem({v,i,id,cover,funcList,h}){
+        new Promise((resolve, reject)=>{
+            switch(v[0]){
+                case YouTube:
+                    resolve($("<img>").attr({src: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`}));
+                    break;
+                case Nico:
+                    resolve($("<iframe>").attr({
+                        src: `https://ext.nicovideo.jp/thumb/sm${id}`,
+                        scrolling: "no",
+                        frameborder: "no"
+                    }));
+                    break;
+                case SoundCloud: {
+                    const w = SC.Widget($("<iframe>").appendTo(hHideArea).attr({
+                        src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}`
+                    }).get(0));
+                    w.bind(SC.Widget.Events.READY, () => {
+                        w.getCurrentSound( r => {
+                            $("<div>").prependTo(h).text(r.title).css({
+                                top: 30,
+                                fontSize: 12,
+                                color: "white",
+                            }).add($("<div>").prependTo(h).text(r.user.username).css({
+                                top: 5,
+                                fontSize: 10,
+                                color: "#999999",
+                                "text-decoration": "underline"
+                            })).css({
+                                padding: 5,
+                                maxWidth: "80%",
+                                maxHeight: "50%",
+                                position: "absolute",
+                                left: 5,
+                                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                            });
+                            const img = r.artwork_url || r.user.avatar_url;
+                            resolve($("<img>").attr({src: img}));
+                        });
+                    });
+                    break;
+                }
+            }
+        }).then(elm=>{
+            if(g_timeStamp !== timeStamp) return;
+            elm.prependTo(h).on("load",()=>{
+                onLoadFunc({i,id,cover,elm,h});
+                hHideArea.empty();
+                const next = i + 1;
+                if(next < funcList.length) setTimeout(()=>funcList[next](),60/130*1000);
+            }).css({
+                maxHeight: 100,
+            });
+        }).catch(err=>msg(err,true));
+    }
+    let loadedCount = 0;
+    function onLoadFunc({i,id,cover,elm,h}){
+        if(g_timeStamp !== timeStamp) return;
+        msg(`Loaded (${++loadedCount}/${g_list.length})`);
+        h.css({
+            width: elm.width(),
+            height: elm.height()
+        });
+        cover.css({
+            position: "absolute",
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0
+        }).on("click",()=>start(i)).on('contextmenu longpress',()=>{
+            if(!isShowingHideArea()) return false;
+            const idx = inputURL().indexOf(id),
+                  e = $("#inputURL").get(0);
+            e.focus();
+            e.setSelectionRange(idx,idx+id.length);
+            return false;
+        });
+    }
 }
-const hPlaylist = $("<div>").appendTo(h).hide();
+const hHideArea = $("<div>").appendTo(h).hide();
 function getPlaylist(resolve, list){
-    new YT.Player($("<div>").appendTo(hPlaylist).get(0),{
+    new YT.Player($("<div>").appendTo(hHideArea).get(0),{
         playerVars: {
             listType: 'playlist',
             list: list
