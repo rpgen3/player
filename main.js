@@ -58,13 +58,13 @@ function loadList(){
             else resolve(r);
         });
     })).then(result=>{
+        const list = result.filter(v=>v);
         hPlaylist.empty();
-        if(!result) return;
+        if(!list.every(v=>v[1])) throw Error("プレイリストの読み込みに失敗しました");
         hItems.empty();
         g_list = [];
-        result.filter(v=>v).forEach(v=>{
+        list.forEach(v=>{
             if(typeof v[1] === "object") {
-                if(!v[1]) throw Error("プレイリストの読み込みに失敗しました");
                 for(const v2 of v[1]) g_list.push( [ v[0], v2 ] );
             }
             else g_list.push(v);
