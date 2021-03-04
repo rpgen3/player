@@ -1,1 +1,1 @@
-javascript:prompt("SoundCloud URL",`https://api.soundcloud.com/tracks/${document.body.innerHTML.match(/tracks:([0-9]+)/)[1]}`)
+javascript:["tracks","playlists"].map(v=>document.body.innerHTML.match(new RegExp(v+":([0-9]+)"))).filter(v=>v).forEach((v,i,a)=>prompt(`URL(${i+1}/${a.length})`,`https://api.soundcloud.com/${v[0].replace(/:/,'\/')}`))
