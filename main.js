@@ -109,7 +109,7 @@ function loadList(){
                   })();
             ids.push(setTimeout(()=>{
                 $(`<${tag}>`).prependTo(h).on("load",function(){
-                    msg(`Loaded (${i}/${g_list.length})`);
+                    msg(`Loaded (${i + 1}/${g_list.length})`);
                     h.css({
                         width: $(this).width(),
                         height: $(this).height()
