@@ -76,6 +76,7 @@ function loadList(){
             }
             else g_list.push(v);
         });
+        let loadedCount = 0;
         g_list.forEach((v,i)=>{
             const h = $("<div>").appendTo(hItems).css({
                 position: "relative",
@@ -109,7 +110,7 @@ function loadList(){
                   })();
             ids.push(setTimeout(()=>{
                 $(`<${tag}>`).prependTo(h).on("load",function(){
-                    msg(`Loaded (${i + 1}/${g_list.length})`);
+                    msg(`Loaded (${++loadedCount}/${g_list.length})`);
                     h.css({
                         width: $(this).width(),
                         height: $(this).height()
