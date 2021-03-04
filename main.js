@@ -178,7 +178,7 @@ function getPlaylistYT(resolve, listType, list){
             list: list
         },
         events: {
-            onReady: e => resolve([ YouTube, e.target.getPlaylistYT() ]),
+            onReady: e => resolve([ YouTube, e.target.getPlaylist() ]),
         }
     });
 }
