@@ -249,7 +249,7 @@ function prev(){
     start(played[played.length - 1]);
 }
 function start(id){
-    prevBtn.attr("disabled", played.length === 1);
+    prevBtn.attr("disabled", played.length < 2);
     const topId = played[played.length - 1];
     if(id !== topId) played.push(id);
     if(unplayed) unplayed.exclude(id);
