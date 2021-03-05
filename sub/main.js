@@ -61,7 +61,8 @@ SoundCloud上で欲しいtrackやplaylistのページに移動した後
         textarea: true,
     });
     const hh = $("<div>").appendTo(h);
-    $("<button>").appendTo(hh).on("click",()=>{
+    $("<button>").appendTo(hh).text("この内容で送信").on("click",()=>{
+        if(!confirm("この内容で送信しますか？")) return;
         const ttl = inputTtl(),
               list = inputURL();
         if(!ttl || !list) return alert("空欄があります。");
