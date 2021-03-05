@@ -56,6 +56,7 @@ SoundCloud上で欲しいtrackやplaylistのページに移動した後
     h.append("<br>");
     const inputTtl = rpgen3.addInputText(h,{
         title: "任意の文字列",
+        change: v => v.replace(/[^a-zA-Z0-9]/g,'')
     });
     const inputURL = rpgen3.addInputText(h,{
         title: "動画URLリスト入力欄",
@@ -69,7 +70,7 @@ SoundCloud上で欲しいtrackやplaylistのページに移動した後
         if(!ttl || !list) return alert("空欄があります。");
         if((ttl + list).length > 1500) {
             return alert(`文字列の長さが1500文字を超えています！
-strToImgで画像に変換し、imgurアップロードした後
+/strToImg/で画像に変換し、imgurアップロードした後
 そのURLを送信してください。`);
         }
         send(`${'#'.repeat(40)}
