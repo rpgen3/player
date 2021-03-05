@@ -43,10 +43,10 @@ SoundCloud上で欲しいtrackやplaylistのページに移動した後
     black("という形式もサポートしていますが、こちらは登録制です。");
     h.append("<br>");
     black("条件を読んで、下記のフォームに必要な内容を入力して送信すれば登録されるかもしれません。");
-    h.append("<br>");
+    h.append("<br><br>");
     black("登録状況はこちらで確認：");
     a("https://github.com/rpgen3/player/tree/main/user");
-    h.append("<br>");
+    h.append("<br><br>");
     text(`条件
 ・任意の文字列は半角文字のみ。
 ・大文字小文字のアルファベットと数字のみ使用可能。
@@ -66,7 +66,7 @@ SoundCloud上で欲しいtrackやplaylistのページに移動した後
         const ttl = inputTtl(),
               list = inputURL();
         if(!ttl || !list) return alert("空欄があります。");
-        const str = `${'-'.repeat(10)}
+        send(`${'-'.repeat(10)}
 ttl
 ${'`'.repeat(3)}
 ${ttl}
@@ -75,7 +75,7 @@ list
 ${'`'.repeat(3)}
 ${list}
 ${'`'.repeat(3)}
-${'-'.repeat(10)}`;
+${'-'.repeat(10)}`);
         hh.text("送信しました。");
     });
     function text(str){
