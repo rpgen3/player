@@ -33,7 +33,7 @@ SoundCloud上で欲しいtrackやplaylistのページに移動した後
     black("「https://i.imgur.com/");
     blue("HFyZOJ6");
     black(".png」の青色の部分をコピーし、");
-    h.append("<br>");
+    h.append("<br><br>");
     blue("https://rpgen3.github.io/player/?imgur=HFyZOJ6");
     black("とURLに付け加えると完成です。");
     h.append("<br>");
