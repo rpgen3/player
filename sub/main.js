@@ -82,7 +82,7 @@ ${'-'.repeat(10)}`;
         return str.split('\n').map(v=>$("<div>").appendTo(h).text(v));
     }
     function blue(str){
-        return $("<span>").appendTo(h).text(str).css({color:"red",backgroundColor:"yellow"});
+        return $("<span>").appendTo(h).text(str).css({color:"white",backgroundColor:"blue"});
     }
     function black(str){
         return $("<span>").appendTo(h).text(str);
