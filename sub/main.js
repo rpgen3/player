@@ -68,9 +68,9 @@ SoundCloud上で欲しいtrackやplaylistのページに移動した後
               list = inputURL();
         if(!ttl || !list) return alert("空欄があります。");
         if((ttl + list).length > 1500) {
-            alert("文字列の長さが1500文字を超えています！");
-            alert("strToImgで画像に変換し、そのURLを送信してください。");
-            return;
+            return alert(`文字列の長さが1500文字を超えています！
+strToImgで画像に変換し、imgurアップロードした後
+そのURLを送信してください。`);
         }
         send(`${'#'.repeat(40)}
 @everyone
