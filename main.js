@@ -116,7 +116,7 @@ function loadList(){
                                 fontSize: 12,
                                 color: "white",
                             }).add($("<div>").prependTo(h).text(r.user.username).css({
-                                top: 5,
+                                top: 3,
                                 fontSize: 10,
                                 color: "#dddddd",
                                 "text-decoration": "underline"
@@ -125,7 +125,7 @@ function loadList(){
                                 maxWidth: "80%",
                                 maxHeight: "50%",
                                 position: "absolute",
-                                left: 5,
+                                left: 3,
                                 backgroundColor: "rgba(0, 0, 0, 0.8)",
                             });
                             const img = r.artwork_url || r.user.avatar_url;
