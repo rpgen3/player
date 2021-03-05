@@ -3,7 +3,7 @@ setTimeout(()=>{
     if(p.user) $.get(`user/${p.user}.txt`,r=>$("#inputURL").val(r));
     else if(p.imgur){
         $("<img>").on("load", function(){
-            $("#hideArea").val(loadImg(this));
+            $("#inputURL").val(loadImg(this));
         }).attr({
             crossOrigin: "anonymous",
             src: `https://i.imgur.com/${p.imgur}.png`
