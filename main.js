@@ -14,7 +14,7 @@ const isShowingHideArea = rpgen3.addHideArea(h,{
     id2: "hideArea"
 });
 let inputURL;
-$.get(`sample.txt`,r=>{
+$.get("sample.txt",r=>{
     inputURL = rpgen3.addInputText("#hideArea",{
         id: "inputURL",
         textarea: true,
