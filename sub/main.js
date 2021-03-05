@@ -66,7 +66,8 @@ SoundCloud上で欲しいtrackやplaylistのページに移動した後
         const ttl = inputTtl(),
               list = inputURL();
         if(!ttl || !list) return alert("空欄があります。");
-        send(`${'-'.repeat(10)}
+        send(`${'#'.repeat(40)}
+@everyone
 ttl
 ${'`'.repeat(3)}
 ${ttl}
@@ -75,7 +76,7 @@ list
 ${'`'.repeat(3)}
 ${list}
 ${'`'.repeat(3)}
-${'-'.repeat(10)}`);
+${'#'.repeat(40)}`);
         hh.text("送信しました。");
     });
     function text(str){
@@ -97,7 +98,7 @@ ${'-'.repeat(10)}`);
         const data = {
             "username": '',
             "avatar_url": '',
-            content: "everyone\n" + content,
+            content: content,
             tts: false
         };
         const xhr = new XMLHttpRequest();
