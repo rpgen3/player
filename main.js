@@ -37,6 +37,10 @@ const isAllowedToLoad = [
     rpgen3.addInputBool("#area2",{ title: "ニコニコ動画", value: true }),
     rpgen3.addInputBool("#area2",{ title: "SoundCloud", value: true }),
 ];
+$("<a>").appendTo("#area2").text("補足説明").attr({
+      href: "https://rpgen3.github.io/player/sub/index.html",
+      target: "_blank",
+});
 const hMsg = $("<div>").appendTo(h);
 function msg(str, isError){
     $("<span>").appendTo(hMsg.empty()).text(str).css({
