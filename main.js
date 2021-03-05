@@ -22,7 +22,7 @@ $.get(`sample.txt`,r=>{
         placeholder: `YouTubeとニコニコ動画とSoundCloudのURL
 SoundCloudは埋め込みURLじゃないと使えないので注意
 YouTubeとSoundCloudはplaylistも可
-YouTubeチャンネルのURLも可`,
+YouTubeチャンネルのURLは/user/を含むものなら使用可能`,
         value: r
     });
 });
@@ -68,7 +68,8 @@ function loadList(){
         });
     })).then(result=>{
         const list = result.filter(v=>v);
-        if(!list.every(v=>v[1])) throw Error("Failed to load playlist");
+        if(!list.every(v=>v[1])) throw Error("Failed to load playlist.");
+        if(!list.length) throw Error("The URL is invalid or empty.");
         hItems.empty();
         g_list = [];
         list.forEach(v=>{
