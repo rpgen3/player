@@ -118,7 +118,7 @@ function loadList(){
                             }).add($("<div>").prependTo(h).text(r.user.username).css({
                                 top: 5,
                                 fontSize: 10,
-                                color: "#999999",
+                                color: "#dddddd",
                                 "text-decoration": "underline"
                             })).css({
                                 padding: 5,
