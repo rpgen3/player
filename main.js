@@ -112,11 +112,11 @@ function loadList(){
                     w.bind(SC.Widget.Events.READY, () => {
                         w.getCurrentSound( r => {
                             $("<div>").prependTo(h).text(r.title).css({
-                                top: 30,
+                                top: 33,
                                 fontSize: 12,
                                 color: "white",
                             }).add($("<div>").prependTo(h).text(r.user.username).css({
-                                top: 3,
+                                top: 5,
                                 fontSize: 10,
                                 color: "#dddddd",
                                 "text-decoration": "underline"
@@ -125,7 +125,7 @@ function loadList(){
                                 maxWidth: "80%",
                                 maxHeight: "50%",
                                 position: "absolute",
-                                left: 3,
+                                left: 5,
                                 backgroundColor: "rgba(0, 0, 0, 0.8)",
                             });
                             const img = r.artwork_url || r.user.avatar_url;
