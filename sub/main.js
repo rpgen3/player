@@ -7,7 +7,7 @@
     $("<h1>").appendTo(h).text("補足説明");
     $("<h2>").appendTo(h).text("Q.SoundCloudの曲を追加するには？");
     var holder = $("<div>").appendTo(h);
-    $.get("sub/bookmarkletSoundCloud.js",r=>{
+    $.get("bookmarkletSoundCloud.js",r=>{
         rpgen3.addInputText(h,{
             title: "bookmarklet",
             readonly: true,
