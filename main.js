@@ -74,7 +74,8 @@ const hItems = $("<div>").appendTo(h).css({
         id = setTimeout(()=>$(e.target).trigger('longpress'), LONGPRESS);
     }).on("mouseup mouseleave touchend",()=>clearTimeout(id));
 })();
-let g_timeStamp = 0;
+let g_timeStamp = 0,
+    g_firstLoadedFlag = new Array(3);
 function loadList(){
     const timeStamp = +new Date;
     g_timeStamp = timeStamp;
@@ -97,19 +98,37 @@ function loadList(){
             }
             else g_list.push(v);
         });
-        const funcList = g_list.map((v,i)=>{
-            const h = $("<div>").appendTo(hItems).css({
-                position: "relative",
-                float: "left"
+        const firstFunc = [
+            playFirstYouTube,
+            playFirstNico,
+            playFirstSoundCloud,
+        ];
+        const promiseArray = [];
+        if(!g_firstLoadedFlag.every(v=>v)){
+            g_list.forEach(v=>{
+                if(!g_firstLoadedFlag[v[0]]){
+                    g_firstLoadedFlag[v[0]] = true;
+                    promiseArray.push(new Promise(resolve=>firstFunc[v[0]](v[1],resolve)));
+                }
             });
-            const cover = $("<div>").appendTo(h).addClass("item"),
-                  id = v[1];
-            return () => loadItem({v,i,id,cover,funcList,h});
-        });
-        funcList[0]();
-        unplayed = prevIdx = null;
-        while(played.length) played.pop();
-        start(0);
+        }
+        if(promiseArray.length) Promise.all(promiseArray).then(opening)
+        else opening();
+        function opening(){
+            const funcList = g_list.map((v,i)=>{
+                const h = $("<div>").appendTo(hItems).css({
+                    position: "relative",
+                    float: "left"
+                });
+                const cover = $("<div>").appendTo(h).addClass("item"),
+                      id = v[1];
+                return () => loadItem({v,i,id,cover,funcList,h});
+            });
+            funcList[0]();
+            unplayed = prevIdx = null;
+            while(played.length) played.pop();
+            start(0);
+        }
     }).catch(err=>msg(err,true));
     function loadItem({v,i,id,cover,funcList,h}){
         new Promise((resolve, reject)=>{
@@ -411,46 +430,57 @@ const hIframe = $("<div>").appendTo(h),
           $("<div>").appendTo(hIframe).hide().append("<iframe>"),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
-const playerEnded = () => repeatPlayFlag() ? play() : next();
-let g_yt,unmutedFlag = false;
-function playYouTube(id) {
-    if(!id) return console.error("YouTube id is empty");
-    if(!g_yt) {
-        g_yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0), {
-            videoId: id,
-            playerVars: {
-                playsinline: 1,
+const playerEnded = videoType => videoType !== whichVideo ? null : repeatPlayFlag() ? play() : next();
+let g_yt,
+    firstFlagYT = false,
+    unmutedFlag = false;
+function playFirstYouTube(id, resolve){
+    g_yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0), {
+        videoId: id,
+        playerVars: {
+            playsinline: 1,
+        },
+        events: {
+            onReady: e => {
+                if(!firstFlagYT) {
+                    firstFlagYT = true
+                    return resolve();
+                }
+                if(whichVideo !== YouTube) return;
+                if(isSmartPhone && !unmutedFlag) {
+                    unmutedFlag = true;
+                    e.target.mute();
+                }
+                play();
             },
-            events: {
-                onReady: e => {
-                    if(isSmartPhone && !unmutedFlag) {
-                        unmutedFlag = true;
-                        e.target.mute();
-                    }
-                    play();
-                },
-                onStateChange: e => {
-                    switch(e.target.getPlayerState()){
-                        case YT.PlayerState.PLAYING: return setVolume();
-                        case YT.PlayerState.ENDED: return playerEnded();
-                    }
+            onStateChange: e => {
+                switch(e.target.getPlayerState()){
+                    case YT.PlayerState.PLAYING: return setVolume();
+                    case YT.PlayerState.ENDED: return playerEnded(YouTube);
                 }
             }
-        });
-    }
-    else g_yt.loadVideoById(id);
+        }
+    });
+}
+function playYouTube(id) {
+    g_yt.loadVideoById(id);
     onResize(iframes[YouTube].find("iframe"));
     showVideo(YouTube);
 }
 const NicoOrigin = 'https://embed.nicovideo.jp';
-function playNico(id){
-    if(!id) return console.error("niconico id is empty");
-    onResize(iframes[Nico].find("iframe").attr({
+function setNico(id){
+    return iframes[Nico].find("iframe").attr({
         src: `//embed.nicovideo.jp/watch/sm${id}?jsapi=1`,
         allowfullscreen: 1,
         playsinline: 1,
         allow: "autoplay"
-    }));
+    });
+}
+function playFirstNico(id, resolve){
+    setNico(id).on("load", resolve);
+}
+function playNico(id){
+    onResize(setNico(id));
     showVideo(Nico);
     setTimeout(play, 3000);
 }
@@ -464,33 +494,31 @@ window.addEventListener('message', e => {
     const { data } = e.data;
     switch(data.playerStatus){
         case 2: return setVolume();
-        case 4: return playerEnded();
+        case 4: return playerEnded(Nico);
     }
 });
 let scWidget;
+function playFirstSoundCloud(id, resolve){
+    scWidget = SC.Widget(iframes[SoundCloud].find("iframe").attr({
+        scrolling: "no",
+        frameborder: "no",
+        playsinline: 1,
+        allow: "autoplay",
+        src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}`
+    }).get(0));
+    scWidget.bind(SC.Widget.Events.READY, resolve);
+    scWidget.bind(SC.Widget.Events.FINISH, () => playerEnded(SoundCloud));
+}
 function playSoundCloud(id){
-    if(!id) return console.error("soundcloud id is empty");
-    const p = {
+    scWidget.load(`https://api.soundcloud.com/tracks/${id}`, {
         auto_play: false,
         show_teaser: false,
         visual: true,
-    };
-    if(!scWidget){
-        scWidget = SC.Widget(iframes[SoundCloud].find("iframe").attr({
-            scrolling: "no",
-            frameborder: "no",
-            playsinline: 1,
-            allow: "autoplay",
-            src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}&` + Object.keys(p).map(v=>v+'='+p[v]).join('&')
-        }).get(0));
-        scWidget.bind(SC.Widget.Events.READY, callback);
-        scWidget.bind(SC.Widget.Events.FINISH, playerEnded);
-    }
-    else scWidget.load(`https://api.soundcloud.com/tracks/${id}`, Object.assign(p,{ callback: callback }));
-    function callback(){
-        setVolume();
-        play();
-    }
+        callback: () => {
+            setVolume();
+            play();
+        }
+    });
     onResize(iframes[SoundCloud].find("iframe"));
     showVideo(SoundCloud);
 }
