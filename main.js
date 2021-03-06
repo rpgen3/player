@@ -3,6 +3,11 @@ const rpgen3 = window.rpgen3,
 const YouTube = 0,
       Nico = 1,
       SoundCloud = 2;
+const videoName = [
+    "YouTube",
+    "ニコニコ動画",
+    "SoundCloud"
+];
 let g_list, g_idx;
 const h = $("<div>").appendTo($("body")).css({
     "text-align": "center",
@@ -30,16 +35,20 @@ h.append("<br>");
 $("<button>").appendTo(h).text("リストを読み込む").on("click",loadList);
 rpgen3.addHideArea(h,{
     title: "読み込み設定",
-    id2: "area2"
+    id2: "conf"
 });
 const isAllowedToLoad = [
-    rpgen3.addInputBool("#area2",{ title: "YouTube", value: true }),
-    rpgen3.addInputBool("#area2",{ title: "ニコニコ動画", value: true }),
-    rpgen3.addInputBool("#area2",{ title: "SoundCloud", value: true }),
+    rpgen3.addInputBool("#conf",{ title: videoName[YouTube], value: true }),
+    rpgen3.addInputBool("#conf",{ title: videoName[Nico], value: true }),
+    rpgen3.addInputBool("#conf",{ title: videoName[SoundCloud], value: true }),
 ];
-$("<a>").appendTo("#area2").text("補足説明").attr({
+$("<a>").appendTo($("<div>").appendTo("#conf")).text("補足説明").attr({
     href: "https://rpgen3.github.io/player/sub/index.html",
     target: "_blank",
+});
+const makeSymbolPlaylist = (videoType, id) => `playlist#${videoName[videoType]}#${id}`;
+$("<button>").appendTo("#conf").text("playlistのキャッシュをクリア").on("click",()=>{
+    ['YouTube','SoundCloud'].forEach(v=>rpgen3.getSaveKeys().filter(v=>new RegExp(`^playlist#${v}#`).test(v)).forEach(v=>rpgen3.removeSaveData(v)));
 });
 const hMsg = $("<div>").appendTo(h);
 function msg(str, isError){
@@ -110,6 +119,23 @@ function loadList(){
                     }));
                     break;
                 case SoundCloud: {
+                    setCache({
+                        symbol: "SoundCloudSymbol#" + id,
+                        callback: makeElm,
+                        getData: save => {
+                            const w = SC.Widget($("<iframe>").appendTo(hHideArea).attr({
+                                src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}`
+                            }).get(0));
+                            w.bind(SC.Widget.Events.READY, () => {
+                                w.getCurrentSound( r => {
+                                    const ttl = r.title,
+                                          userName = r.user.username,
+                                          img = r.artwork_url || r.user.avatar_url;
+                                    makeElm(save({ttl,userName,img}));
+                                });
+                            });
+                        }
+                    });
                     function makeElm({ttl,userName,img}){
                         $("<div>").prependTo(h).text(ttl).css({
                             top: 33,
@@ -130,29 +156,6 @@ function loadList(){
                         });
                         resolve($("<img>").attr({src: img}));
                     }
-                    function getData(){
-                        const w = SC.Widget($("<iframe>").appendTo(hHideArea).attr({
-                            src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}`
-                        }).get(0));
-                        w.bind(SC.Widget.Events.READY, () => {
-                            w.getCurrentSound( r => {
-                                const ttl = r.title,
-                                      userName = r.user.username,
-                                      img = r.artwork_url || r.user.avatar_url;
-                                makeElm({ttl,userName,img});
-                                rpgen3.save(SoundCloudSymbol, JSON.stringify({ttl,userName,img}));
-                            });
-                        });
-                    }
-                    const SoundCloudSymbol = "SoundCloudSymbol:" + id;
-                    if(!rpgen3.load(SoundCloudSymbol, r=>{
-                        try{
-                            makeElm(JSON.parse(r));
-                        }
-                        catch(err){
-                            getData();
-                        }
-                    })) getData();
                     break;
                 }
             }
@@ -193,22 +196,46 @@ function loadList(){
     }
 }
 const hHideArea = $("<div>").appendTo(h).hide();
+function setCache({symbol, getData, callback}){
+    const f = () => getData(obj=>{
+        rpgen3.save(symbol, JSON.stringify(obj));
+        return obj;
+    });
+    if(!rpgen3.load(symbol, r=>{
+        try { callback(JSON.parse(r)); }
+        catch(err) { f(); }
+    })) f();
+}
 function getPlaylistYT(resolve, listType, list){
-    new YT.Player($("<div>").appendTo(hHideArea).get(0),{
-        playerVars: {
-            listType: listType,
-            list: list
-        },
-        events: {
-            onReady: e => resolve([ YouTube, e.target.getPlaylist() ]),
+    setCache({
+        symbol: makeSymbolPlaylist(YouTube, listType + list),
+        callback: v => resolve([ YouTube, v ]),
+        getData: save => {
+            new YT.Player($("<div>").appendTo(hHideArea).get(0),{
+                playerVars: {
+                    listType: listType,
+                    list: list
+                },
+                events: {
+                    onReady: e => resolve([ YouTube, save(e.target.getPlaylist()) ]),
+                }
+            });
         }
     });
 }
 function getPlaylistSC(resolve, id){
-    const w = SC.Widget($("<iframe>").appendTo(hHideArea).attr({
-        src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/${id}`
-    }).get(0));
-    w.bind(SC.Widget.Events.READY, () => w.getSounds(r=>resolve([ SoundCloud, r.map(v=>v.id) ])));
+    setCache({
+        symbol: makeSymbolPlaylist(SoundCloud, id),
+        callback: v => resolve([ SoundCloud, v ]),
+        getData: save => {
+            const w = SC.Widget($("<iframe>").appendTo(hHideArea).attr({
+                src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/${id}`
+            }).get(0));
+            w.bind(SC.Widget.Events.READY, () => w.getSounds(r=>{
+                resolve([ SoundCloud, save(r.map(v=>v.id)) ])
+            }));
+        }
+    });
 }
 function judgeURL(url){
     if(!url) return;
@@ -459,13 +486,7 @@ function playSoundCloud(id){
 }
 let inputVolume;
 function makeInputVolume(){
-    const ttl = (()=>{
-        switch(whichVideo){
-            case YouTube: return "YouTube";
-            case Nico: return "ニコニコ動画";
-            case SoundCloud: return "SoundCloud";
-        }
-    })() + "の音量";
+    const ttl = videoName[whichVideo] + "の音量";
     inputVolume = null;
     inputVolume = rpgen3.addInputRange(hInputVolume.empty(),{
         title: ttl,
