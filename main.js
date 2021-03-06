@@ -75,7 +75,7 @@ const hItems = $("<div>").appendTo(h).css({
     }).on("mouseup mouseleave touchend",()=>clearTimeout(id));
 })();
 let g_timeStamp = 0,
-    g_firstLoadedFlag = new Array(3);
+    g_firstLoadedFlags = new Array(3).fill(false);
 function loadList(){
     const timeStamp = +new Date;
     g_timeStamp = timeStamp;
@@ -104,12 +104,11 @@ function loadList(){
             playFirstSoundCloud,
         ];
         const promiseArray = [];
-        if(!g_firstLoadedFlag.every(v=>v)){
+        if(!g_firstLoadedFlags.every(v=>v)){
             g_list.forEach(v=>{
-                if(!g_firstLoadedFlag[v[0]]){
-                    g_firstLoadedFlag[v[0]] = true;
-                    promiseArray.push(new Promise(resolve=>firstFunc[v[0]](v[1],resolve)));
-                }
+                if(g_firstLoadedFlags[v[0]]) return;
+                g_firstLoadedFlags[v[0]] = true;
+                promiseArray.push(new Promise(resolve=>firstFunc[v[0]](v[1],resolve)));
             });
         }
         if(promiseArray.length) Promise.all(promiseArray).then(opening)
