@@ -143,6 +143,7 @@ function loadList(){
                 "text-decoration": "underline"
             }));
         }
+        else infoElm.css({top: 5});
         infoElm.css({
             padding: 5,
             maxWidth: "80%",
@@ -167,8 +168,6 @@ function loadList(){
                         callback: makeElm2,
                         getData: save => {
                             funcNico = ({checkId,ttl,img}) => {
-                                console.log({checkId,ttl,img});
-                                console.log(id);
                                 if(checkId !== id) return;
                                 funcNico = null;
                                 makeElm2(save({ttl,img}));
