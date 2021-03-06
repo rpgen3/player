@@ -38,8 +38,8 @@ const isAllowedToLoad = [
     rpgen3.addInputBool("#area2",{ title: "SoundCloud", value: true }),
 ];
 $("<a>").appendTo("#area2").text("補足説明").attr({
-      href: "https://rpgen3.github.io/player/sub/index.html",
-      target: "_blank",
+    href: "https://rpgen3.github.io/player/sub/index.html",
+    target: "_blank",
 });
 const hMsg = $("<div>").appendTo(h);
 function msg(str, isError){
@@ -110,32 +110,49 @@ function loadList(){
                     }));
                     break;
                 case SoundCloud: {
-                    const w = SC.Widget($("<iframe>").appendTo(hHideArea).attr({
-                        src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}`
-                    }).get(0));
-                    w.bind(SC.Widget.Events.READY, () => {
-                        w.getCurrentSound( r => {
-                            $("<div>").prependTo(h).text(r.title).css({
-                                top: 33,
-                                fontSize: 12,
-                                color: "white",
-                            }).add($("<div>").prependTo(h).text(r.user.username).css({
-                                top: 5,
-                                fontSize: 10,
-                                color: "#cccccc",
-                                "text-decoration": "underline"
-                            })).css({
-                                padding: 5,
-                                maxWidth: "80%",
-                                maxHeight: "50%",
-                                position: "absolute",
-                                left: 5,
-                                backgroundColor: "rgba(0, 0, 0, 0.8)",
-                            });
-                            const img = r.artwork_url || r.user.avatar_url;
-                            resolve($("<img>").attr({src: img}));
+                    function makeElm({ttl,userName,img}){
+                        $("<div>").prependTo(h).text(ttl).css({
+                            top: 33,
+                            fontSize: 12,
+                            color: "white",
+                        }).add($("<div>").prependTo(h).text(userName).css({
+                            top: 5,
+                            fontSize: 10,
+                            color: "#cccccc",
+                            "text-decoration": "underline"
+                        })).css({
+                            padding: 5,
+                            maxWidth: "80%",
+                            maxHeight: "50%",
+                            position: "absolute",
+                            left: 5,
+                            backgroundColor: "rgba(0, 0, 0, 0.8)",
                         });
-                    });
+                        resolve($("<img>").attr({src: img}));
+                    }
+                    function getData(){
+                        const w = SC.Widget($("<iframe>").appendTo(hHideArea).attr({
+                            src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}`
+                        }).get(0));
+                        w.bind(SC.Widget.Events.READY, () => {
+                            w.getCurrentSound( r => {
+                                const ttl = r.title,
+                                      userName = r.user.username,
+                                      img = r.artwork_url || r.user.avatar_url;
+                                makeElm({ttl,userName,img});
+                                rpgen3.save(SoundCloudSymbol, JSON.stringify({ttl,userName,img}));
+                            });
+                        });
+                    }
+                    const SoundCloudSymbol = "SoundCloudSymbol:" + id;
+                    if(!rpgen3.load(SoundCloudSymbol, r=>{
+                        try{
+                            makeElm(JSON.parse(r));
+                        }
+                        catch(err){
+                            getData();
+                        }
+                    })) getData();
                     break;
                 }
             }
