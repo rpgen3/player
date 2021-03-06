@@ -46,9 +46,15 @@ $("<a>").appendTo($("<div>").appendTo("#conf")).text("補足説明").attr({
     href: "https://rpgen3.github.io/player/sub/index.html",
     target: "_blank",
 });
-const makeKeyPlaylist = (videoType, id) => `playlist#${videoName[videoType]}#${id}`;
+$("#conf").append("<br>");
+const makeKeyOfPlaylist = (videoType, id) => `playlist#${videoName[videoType]}#${id}`;
 $("<button>").appendTo("#conf").text("playlistのキャッシュをクリア").on("click",()=>{
-    ['YouTube','SoundCloud'].forEach(v=>rpgen3.getSaveKeys().filter(v=>new RegExp(`^playlist#${v}#`).test(v)).forEach(v=>rpgen3.removeSaveData(v)));
+    if(!confirm("playlistのキャッシュを削除しますか？")) return;
+    rpgen3.makeArray(3).map(v=>videoName[v]).forEach(videoType=>{
+        rpgen3.getSaveKeys().filter(v=>(new RegExp(`^playlist#${videoType}#`)).test(v)).forEach(v=>{
+            rpgen3.removeSaveData(v);
+        });
+    });
 });
 const hMsg = $("<div>").appendTo(h);
 function msg(str, isError){
@@ -208,7 +214,7 @@ function setCache({key, getData, callback}){
 }
 function getPlaylistYT(resolve, listType, list){
     setCache({
-        key: makeKeyPlaylist(YouTube, listType + list),
+        key: makeKeyOfPlaylist(YouTube, listType + list),
         callback: v => resolve([ YouTube, v ]),
         getData: save => {
             new YT.Player($("<div>").appendTo(hHideArea).get(0),{
@@ -225,7 +231,7 @@ function getPlaylistYT(resolve, listType, list){
 }
 function getPlaylistSC(resolve, id){
     setCache({
-        key: makeKeyPlaylist(SoundCloud, id),
+        key: makeKeyOfPlaylist(SoundCloud, id),
         callback: v => resolve([ SoundCloud, v ]),
         getData: save => {
             const w = SC.Widget($("<iframe>").appendTo(hHideArea).attr({
