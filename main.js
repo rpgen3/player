@@ -129,23 +129,58 @@ function loadList(){
             start(0);
         }
     }).catch(err=>msg(err,true));
+    function makeElm({resolve,h,ttl,userName,img}){
+        const infoElm = $("<div>").prependTo(h).text(ttl).css({
+            top: 33,
+            fontSize: 12,
+            color: "white",
+        });
+        if(userName){
+            infoElm.add($("<div>").prependTo(h).text(userName).css({
+                top: 5,
+                fontSize: 10,
+                color: "#cccccc",
+                "text-decoration": "underline"
+            }));
+        }
+        infoElm.css({
+            padding: 5,
+            maxWidth: "80%",
+            maxHeight: "50%",
+            position: "absolute",
+            left: 5,
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+        });
+        resolve($("<img>").attr({src: img}));
+    }
     function loadItem({v,i,id,cover,funcList,h}){
         new Promise((resolve, reject)=>{
+            const makeElm2 = ({ttl,userName,img}) => makeElm({resolve,h,ttl,userName,img}),
+                  keyOfVideoInfo = `videoInfo#${videoName[v[0]]}#${id}`;
             switch(v[0]){
                 case YouTube:
                     resolve($("<img>").attr({src: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`}));
                     break;
                 case Nico:
-                    resolve($("<iframe>").attr({
-                        src: `https://ext.nicovideo.jp/thumb/sm${id}`,
-                        scrolling: "no",
-                        frameborder: "no"
-                    }));
+                    setCache({
+                        key: keyOfVideoInfo,
+                        callback: makeElm2,
+                        getData: save => {
+                            window.funcNico = ({checkId,ttl,img}) => {
+                                if(checkId !== id) return;
+                                window.funcNico = () => {};
+                                makeElm2(save({ttl,img}));
+                            };
+                            $("<iframe>").appendTo(hHideArea).attr({
+                                src: `//embed.nicovideo.jp/watch/sm${id}?jsapi=1`
+                            });
+                        }
+                    });
                     break;
                 case SoundCloud: {
                     setCache({
-                        key: "SoundCloudSymbol#" + id,
-                        callback: makeElm,
+                        key: keyOfVideoInfo,
+                        callback: makeElm2,
                         getData: save => {
                             const w = SC.Widget($("<iframe>").appendTo(hHideArea).attr({
                                 src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}`
@@ -155,31 +190,11 @@ function loadList(){
                                     const ttl = r.title,
                                           userName = r.user.username,
                                           img = r.artwork_url || r.user.avatar_url;
-                                    makeElm(save({ttl,userName,img}));
+                                    makeElm2(save({ttl,userName,img}));
                                 });
                             });
                         }
                     });
-                    function makeElm({ttl,userName,img}){
-                        $("<div>").prependTo(h).text(ttl).css({
-                            top: 33,
-                            fontSize: 12,
-                            color: "white",
-                        }).add($("<div>").prependTo(h).text(userName).css({
-                            top: 5,
-                            fontSize: 10,
-                            color: "#cccccc",
-                            "text-decoration": "underline"
-                        })).css({
-                            padding: 5,
-                            maxWidth: "80%",
-                            maxHeight: "50%",
-                            position: "absolute",
-                            left: 5,
-                            backgroundColor: "rgba(0, 0, 0, 0.8)",
-                        });
-                        resolve($("<img>").attr({src: img}));
-                    }
                     break;
                 }
             }
@@ -489,13 +504,32 @@ function postNico(r) {
     }, r), NicoOrigin);
 }
 window.addEventListener('message', e => {
-    if (e.origin !== NicoOrigin || e.data.eventName !== 'playerStatusChange') return;
+    if (e.origin !== NicoOrigin) return;
     const { data } = e.data;
-    switch(data.playerStatus){
-        case 2: return setVolume();
-        case 4: return playerEnded(Nico);
+    switch (e.data.eventName) {
+        case 'playerMetadataChange': break;
+        case 'playerStatusChange': {
+            switch(data.playerStatus){
+                case 2: return setVolume();
+                case 4: return playerEnded(Nico);
+            }
+            break;
+        }
+        case 'loadComplete': {
+            getInfoNico(data.videoInfo);
+            break;
+        }
+        default: break;
     }
 });
+function getInfoNico(videoInfo){
+    const m = (videoInfo.videoId || videoInfo.watchId).match(/[0-9]+/);
+    if(!m) return;
+    const checkId = m[0],
+          ttl = videoInfo.title,
+          img = videoInfo.thumbnailUrl;
+    if("function" === window.funcNico) window.funcNico({checkId,ttl,img});
+}
 let scWidget;
 function playFirstSoundCloud(id, resolve){
     scWidget = SC.Widget(iframes[SoundCloud].find("iframe").attr({
