@@ -166,9 +166,11 @@ function loadList(){
                         key: keyOfVideoInfo,
                         callback: makeElm2,
                         getData: save => {
-                            window.funcNico = ({checkId,ttl,img}) => {
+                            funcNico = ({checkId,ttl,img}) => {
+                                console.log({checkId,ttl,img});
+                                console.log(id);
                                 if(checkId !== id) return;
-                                window.funcNico = () => {};
+                                funcNico = null;
                                 makeElm2(save({ttl,img}));
                             };
                             $("<iframe>").appendTo(hHideArea).attr({
@@ -210,10 +212,9 @@ function loadList(){
             });
         }).catch(err=>msg(err,true));
     }
-    let loadedCount = 0;
     function onLoadFunc({i,id,cover,elm,h}){
         if(g_timeStamp !== timeStamp) return;
-        msg(`Loaded (${++loadedCount}/${g_list.length})`);
+        msg(`Loaded (${i + 1}/${g_list.length})`);
         h.css({
             width: elm.width(),
             height: elm.height()
@@ -522,13 +523,14 @@ window.addEventListener('message', e => {
         default: break;
     }
 });
+let funcNico;
 function getInfoNico(videoInfo){
     const m = (videoInfo.videoId || videoInfo.watchId).match(/[0-9]+/);
     if(!m) return;
     const checkId = m[0],
           ttl = videoInfo.title,
           img = videoInfo.thumbnailUrl;
-    if("function" === window.funcNico) window.funcNico({checkId,ttl,img});
+    if("function" === typeof funcNico) funcNico({checkId,ttl,img});
 }
 let scWidget;
 function playFirstSoundCloud(id, resolve){
