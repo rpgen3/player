@@ -43,6 +43,8 @@ SoundCloud上で欲しいtrackやplaylistのページに移動した後
     black("という形式もサポートしていますが、こちらは登録制です。");
     h.append("<br>");
     black("条件を読んで、下記のフォームに必要な内容を入力して送信すれば登録されるかもしれません。");
+    h.append("<br>");
+    black("審査して手動で登録するので反映に時間を要します。");
     h.append("<br><br>");
     black("登録状況はこちらで確認：");
     a("https://github.com/rpgen3/player/tree/main/user");
