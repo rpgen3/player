@@ -130,13 +130,13 @@ function loadList(){
         }
     }).catch(err=>msg(err,true));
     function makeElm({resolve,h,ttl,userName,img}){
-        const infoElm = $("<div>").prependTo(h).text(ttl).css({
+        let infoElm = $("<div>").prependTo(h).text(ttl).css({
             top: 33,
             fontSize: 12,
             color: "white",
         });
         if(userName){
-            infoElm.add($("<div>").prependTo(h).text(userName).css({
+            infoElm = infoElm.add($("<div>").prependTo(h).text(userName).css({
                 top: 5,
                 fontSize: 10,
                 color: "#cccccc",
@@ -150,7 +150,7 @@ function loadList(){
             maxHeight: "50%",
             position: "absolute",
             left: 5,
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
         });
         resolve($("<img>").attr({src: img}));
     }
