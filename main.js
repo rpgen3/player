@@ -42,10 +42,6 @@ const isAllowedToLoad = [
     rpgen3.addInputBool("#conf",{ title: videoName[Nico], value: true }),
     rpgen3.addInputBool("#conf",{ title: videoName[SoundCloud], value: true }),
 ];
-$("<a>").appendTo($("<div>").appendTo("#conf")).text("補足説明").attr({
-    href: "https://rpgen3.github.io/player/sub/index.html",
-    target: "_blank",
-});
 $("#conf").append("<br>");
 const makeKeyOfPlaylist = (videoType, id) => `playlist#${videoName[videoType]}#${id}`;
 $("<button>").appendTo("#conf").text("playlistのキャッシュをクリア").on("click",()=>{
@@ -55,6 +51,10 @@ $("<button>").appendTo("#conf").text("playlistのキャッシュをクリア").o
             rpgen3.removeSaveData(v);
         });
     });
+});
+$("<a>").appendTo("#conf").text("補足説明").attr({
+    href: "https://rpgen3.github.io/player/sub/index.html",
+    target: "_blank",
 });
 const hMsg = $("<div>").appendTo(h);
 function msg(str, isError){
