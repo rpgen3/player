@@ -46,7 +46,7 @@ $("<a>").appendTo($("<div>").appendTo("#conf")).text("補足説明").attr({
     href: "https://rpgen3.github.io/player/sub/index.html",
     target: "_blank",
 });
-const makeSymbolPlaylist = (videoType, id) => `playlist#${videoName[videoType]}#${id}`;
+const makeKeyPlaylist = (videoType, id) => `playlist#${videoName[videoType]}#${id}`;
 $("<button>").appendTo("#conf").text("playlistのキャッシュをクリア").on("click",()=>{
     ['YouTube','SoundCloud'].forEach(v=>rpgen3.getSaveKeys().filter(v=>new RegExp(`^playlist#${v}#`).test(v)).forEach(v=>rpgen3.removeSaveData(v)));
 });
@@ -120,7 +120,7 @@ function loadList(){
                     break;
                 case SoundCloud: {
                     setCache({
-                        symbol: "SoundCloudSymbol#" + id,
+                        key: "SoundCloudSymbol#" + id,
                         callback: makeElm,
                         getData: save => {
                             const w = SC.Widget($("<iframe>").appendTo(hHideArea).attr({
@@ -196,19 +196,19 @@ function loadList(){
     }
 }
 const hHideArea = $("<div>").appendTo(h).hide();
-function setCache({symbol, getData, callback}){
+function setCache({key, getData, callback}){
     const f = () => getData(obj=>{
-        rpgen3.save(symbol, JSON.stringify(obj));
+        rpgen3.save(key, JSON.stringify(obj));
         return obj;
     });
-    if(!rpgen3.load(symbol, r=>{
+    if(!rpgen3.load(key, r=>{
         try { callback(JSON.parse(r)); }
         catch(err) { f(); }
     })) f();
 }
 function getPlaylistYT(resolve, listType, list){
     setCache({
-        symbol: makeSymbolPlaylist(YouTube, listType + list),
+        key: makeKeyPlaylist(YouTube, listType + list),
         callback: v => resolve([ YouTube, v ]),
         getData: save => {
             new YT.Player($("<div>").appendTo(hHideArea).get(0),{
@@ -225,7 +225,7 @@ function getPlaylistYT(resolve, listType, list){
 }
 function getPlaylistSC(resolve, id){
     setCache({
-        symbol: makeSymbolPlaylist(SoundCloud, id),
+        key: makeKeyPlaylist(SoundCloud, id),
         callback: v => resolve([ SoundCloud, v ]),
         getData: save => {
             const w = SC.Widget($("<iframe>").appendTo(hHideArea).attr({
