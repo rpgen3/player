@@ -27,7 +27,7 @@ $.get("sample.txt",r=>{
         placeholder: `YouTubeとニコニコ動画とSoundCloudのURL
 SoundCloudは埋め込みURLじゃないと使えないので注意
 YouTubeとSoundCloudはplaylistも可
-YouTubeチャンネルのURLは/user/を含むものなら使用可能`,
+YouTubeチャンネルのURLも使用可能`,
         value: r
     });
 });
@@ -257,6 +257,10 @@ function judgeURL(url){
             if(/user/.test(url)) {
                 m = url.match(/user\/([A-Za-z0-9_\-]+)/);
                 if(m) return resolve => getPlaylistYT(resolve, 'user_uploads', m[1]);
+            }
+            if(/channel/.test(url)) {
+                m = url.match(/channel\/UC([A-Za-z0-9_\-]+)/);
+                if(m) return resolve => getPlaylistYT(resolve, 'playlist', 'UU' + m[1]);
             }
             // if(p.search_query) return resolve => getPlaylistYT(resolve, 'search', p.search_query);
             if(!m) m = url.match(/[\?&]v=([A-Za-z0-9_\-]+)/);
