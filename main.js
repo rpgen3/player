@@ -149,7 +149,7 @@ function makeElm({resolve,h,ttl,userName,img}){
     infoElm.css({
         padding: 5,
         maxWidth: "80%",
-        maxHeight: "50%",
+        maxHeight: userName ? "50%" : "80%",
         position: "absolute",
         left: 5,
         backgroundColor: "rgba(0, 0, 0, 0.7)",
