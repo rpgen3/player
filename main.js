@@ -130,7 +130,6 @@ function loadList(){
         }
     }).catch(err=>msg(err,true));
 }
-
 function makeElm({resolve,h,ttl,userName,img}){
     let infoElm = $("<div>").prependTo(h).text(ttl).css({
         top: 33,
