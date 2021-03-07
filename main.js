@@ -18,18 +18,19 @@ const isShowingHideArea = rpgen3.addHideArea(h,{
     title: "動画URLリスト入力欄",
     id2: "hideArea"
 });
-let inputURL;
-$.get("sample.txt",r=>{
-    inputURL = rpgen3.addInputText("#hideArea",{
-        id: "inputURL",
-        textarea: true,
-        save:  "動画URLリスト入力欄",
-        placeholder: `YouTubeとニコニコ動画とSoundCloudのURL
+window.paramInputURL = {
+    id: "inputURL",
+    textarea: true,
+    placeholder: `YouTubeとニコニコ動画とSoundCloudのURL
 SoundCloudは埋め込みURLじゃないと使えないので注意
 YouTubeとSoundCloudはplaylistも可
 YouTubeチャンネルのURLも使用可能`,
+};
+$.get("sample.txt",r=>{
+    window.inputURL = rpgen3.addInputText("#hideArea",Object.assign({
+        save:  "動画URLリスト入力欄",
         value: r
-    });
+    }, window.paramInputURL));
 });
 h.append("<br>");
 $("<button>").appendTo(h).text("リストを読み込む").on("click",loadList);
@@ -80,7 +81,7 @@ function loadList(){
     const timeStamp = +new Date;
     g_timeStamp = timeStamp;
     msg("Now Loading...");
-    Promise.all(inputURL().split('\n').filter(v=>v).map(url=>{
+    Promise.all(window.inputURL().split('\n').filter(v=>v).map(url=>{
         return new Promise((resolve, reject)=>{
             const r = judgeURL(url);
             if(typeof r === "function") r(resolve);
@@ -227,7 +228,7 @@ function onLoadFunc({i,id,cover,elm,h}){
         right: 0
     }).on("click",()=>start(i)).on('contextmenu longpress',()=>{
         if(!isShowingHideArea()) return false;
-        const idx = inputURL().indexOf(id),
+        const idx = window.inputURL().indexOf(id),
               e = $("#inputURL").get(0);
         e.focus();
         e.setSelectionRange(idx,idx+id.length);
