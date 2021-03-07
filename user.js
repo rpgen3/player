@@ -1,15 +1,20 @@
 setTimeout(()=>{
     const p = rpgen3.getParam();
-    if(p.user) $.get(`user/${p.user}.txt`,r=>$("#inputURL").val(r));
+    if(p.user) $.get(`user/${p.user}.txt`,r=>makeNewInputURL(r));
     else if(p.imgur){
         $("<img>").on("load", function(){
-            $("#inputURL").val(loadImg(this));
+            makeNewInputURL(loadImg(this));
         }).attr({
             crossOrigin: "anonymous",
             src: `https://i.imgur.com/${p.imgur}.png`
         });
     }
 },1000);
+function makeNewInputURL(value){
+    window.inputURL = rpgen3.addInputText($("#hideArea").empty(),Object.assign({
+        value: value
+    }, window.paramInputURL));
+}
 function loadImg(img){
     const width = img.width,
           height = img.height,
