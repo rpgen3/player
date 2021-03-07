@@ -9,7 +9,7 @@ setTimeout(()=>{
             src: `https://i.imgur.com/${p.imgur}.png`
         });
     }
-},1000);
+},500);
 function makeNewInputURL(value){
     window.inputURL = rpgen3.addInputText($("#hideArea").empty(),Object.assign({
         value: value
