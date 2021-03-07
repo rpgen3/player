@@ -1,4 +1,4 @@
-setTimeout(()=>{
+(()=>{
     const p = rpgen3.getParam();
     if(p.user) $.get(`user/${p.user}.txt`,r=>makeNewInputURL(r));
     else if(p.imgur){
@@ -9,7 +9,7 @@ setTimeout(()=>{
             src: `https://i.imgur.com/${p.imgur}.png`
         });
     }
-},500);
+})();
 function makeNewInputURL(value){
     window.inputURL = rpgen3.addInputText($("#hideArea").empty(),Object.assign({
         value: value
