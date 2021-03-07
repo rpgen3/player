@@ -68,13 +68,6 @@ const hItems = $("<div>").appendTo(h).css({
     overflowY: "scroll",
     maxHeight: "40vh",
 });
-(()=>{
-    const LONGPRESS = 1000;
-    let id;
-    $(window).on("mousedown touchstart",e=>{
-        id = setTimeout(()=>$(e.target).trigger('longpress'), LONGPRESS);
-    }).on("mouseup mouseleave touchend",()=>clearTimeout(id));
-})();
 let g_timeStamp = 0,
     g_firstLoadedFlags = new Array(3).fill(false);
 function loadList(){
@@ -226,7 +219,7 @@ function onLoadFunc({i,id,cover,elm,h}){
         left: 0,
         bottom: 0,
         right: 0
-    }).on("click",()=>start(i)).on('contextmenu longpress',()=>{
+    }).on("click",()=>start(i)).on('contextmenu',()=>{
         if(!isShowingHideArea()) return false;
         const idx = window.inputURL().indexOf(id),
               e = $("#inputURL").get(0);
