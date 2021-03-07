@@ -494,12 +494,7 @@ function playFirstNico(id, resolve){
     setNico(id).on("load", resolve);
 }
 function playNico(id){
-    loadedNico = ({checkId}) => {
-        if(checkId !== id) return;
-        loadedNico = null;
-        play();
-    };
-    onResize(setNico(id));
+    onResize(setNico(id).on("load",play));
     showVideo(Nico);
 }
 function postNico(r) {
@@ -526,7 +521,7 @@ window.addEventListener('message', e => {
         default: break;
     }
 });
-let funcNico, loadedNico;
+let funcNico;
 function getInfoNico(videoInfo){
     const m = (videoInfo.videoId || videoInfo.watchId).match(/[0-9]+/);
     if(!m) return;
@@ -534,7 +529,6 @@ function getInfoNico(videoInfo){
           ttl = videoInfo.title,
           img = videoInfo.thumbnailUrl;
     if("function" === typeof funcNico) funcNico({checkId,ttl,img});
-    if("function" === typeof loadedNico) loadedNico({checkId});
 }
 let scWidget;
 function playFirstSoundCloud(id, resolve){
