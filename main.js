@@ -494,9 +494,13 @@ function playFirstNico(id, resolve){
     setNico(id).on("load", resolve);
 }
 function playNico(id){
+    loadedNico = ({checkId}) => {
+        if(checkId !== id) return;
+        loadedNico = null;
+        play();
+    };
     onResize(setNico(id));
     showVideo(Nico);
-    setTimeout(play, 3000);
 }
 function postNico(r) {
     iframes[Nico].find("iframe").get(0).contentWindow.postMessage(Object.assign({
@@ -522,7 +526,7 @@ window.addEventListener('message', e => {
         default: break;
     }
 });
-let funcNico;
+let funcNico, loadedNico;
 function getInfoNico(videoInfo){
     const m = (videoInfo.videoId || videoInfo.watchId).match(/[0-9]+/);
     if(!m) return;
@@ -530,6 +534,7 @@ function getInfoNico(videoInfo){
           ttl = videoInfo.title,
           img = videoInfo.thumbnailUrl;
     if("function" === typeof funcNico) funcNico({checkId,ttl,img});
+    if("function" === typeof loadedNico) loadedNico({checkId});
 }
 let scWidget;
 function playFirstSoundCloud(id, resolve){
