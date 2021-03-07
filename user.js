@@ -1,6 +1,6 @@
 setTimeout(()=>{
     const p = rpgen3.getParam();
-    if(p.user) $.get(`user/${p.user}.txt`,r=>makeNewInputURL(r));
+    if(p.user) $.get(`user/${p.user}.txt`, makeNewInputURL);
     else if(p.imgur){
         $("<img>").on("load", function(){
             makeNewInputURL(loadImg(this));
