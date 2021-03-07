@@ -121,7 +121,7 @@ function loadList(){
                 });
                 const cover = $("<div>").appendTo(h).addClass("item"),
                       id = v[1];
-                return () => loadItem({v,i,id,cover,funcList,h});
+                return () => loadItem({timeStamp,v,i,id,cover,funcList,h});
             });
             funcList[0]();
             unplayed = prevIdx = null;
@@ -129,110 +129,111 @@ function loadList(){
             start(0);
         }
     }).catch(err=>msg(err,true));
-    function makeElm({resolve,h,ttl,userName,img}){
-        let infoElm = $("<div>").prependTo(h).text(ttl).css({
-            top: 33,
-            fontSize: 12,
-            color: "white",
-        });
-        if(userName){
-            infoElm = infoElm.add($("<div>").prependTo(h).text(userName).css({
-                top: 5,
-                fontSize: 10,
-                color: "#cccccc",
-                "text-decoration": "underline"
-            }));
-        }
-        else infoElm.css({top: 5});
-        infoElm.css({
-            padding: 5,
-            maxWidth: "80%",
-            maxHeight: "50%",
-            position: "absolute",
-            left: 5,
-            backgroundColor: "rgba(0, 0, 0, 0.7)",
-        });
-        resolve($("<img>").attr({src: img}));
+}
+
+function makeElm({resolve,h,ttl,userName,img}){
+    let infoElm = $("<div>").prependTo(h).text(ttl).css({
+        top: 33,
+        fontSize: 12,
+        color: "white",
+    });
+    if(userName){
+        infoElm = infoElm.add($("<div>").prependTo(h).text(userName).css({
+            top: 5,
+            fontSize: 10,
+            color: "#cccccc",
+            "text-decoration": "underline"
+        }));
     }
-    function loadItem({v,i,id,cover,funcList,h}){
-        new Promise((resolve, reject)=>{
-            const makeElm2 = ({ttl,userName,img}) => makeElm({resolve,h,ttl,userName,img}),
-                  keyOfVideoInfo = `videoInfo#${videoName[v[0]]}#${id}`;
-            switch(v[0]){
-                case YouTube:
-                    resolve($("<img>").attr({src: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`}));
-                    break;
-                case Nico:
-                    setCache({
-                        key: keyOfVideoInfo,
-                        callback: makeElm2,
-                        getData: save => {
-                            funcNico = ({checkId,ttl,img}) => {
-                                if(checkId !== id) return;
-                                funcNico = null;
-                                makeElm2(save({ttl,img}));
-                            };
-                            $("<iframe>").appendTo(hHideArea).attr({
-                                src: `//embed.nicovideo.jp/watch/sm${id}?jsapi=1`
+    else infoElm.css({top: 5});
+    infoElm.css({
+        padding: 5,
+        maxWidth: "80%",
+        maxHeight: "50%",
+        position: "absolute",
+        left: 5,
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+    });
+    resolve($("<img>").attr({src: img}));
+}
+function loadItem({timeStamp,v,i,id,cover,funcList,h}){
+    new Promise((resolve, reject)=>{
+        const makeElm2 = ({ttl,userName,img}) => makeElm({resolve,h,ttl,userName,img}),
+              keyOfVideoInfo = `videoInfo#${videoName[v[0]]}#${id}`;
+        switch(v[0]){
+            case YouTube:
+                resolve($("<img>").attr({src: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`}));
+                break;
+            case Nico:
+                setCache({
+                    key: keyOfVideoInfo,
+                    callback: makeElm2,
+                    getData: save => {
+                        funcNico = ({checkId,ttl,img}) => {
+                            if(checkId !== id) return;
+                            funcNico = null;
+                            makeElm2(save({ttl,img}));
+                        };
+                        $("<iframe>").appendTo(hHideArea).attr({
+                            src: `//embed.nicovideo.jp/watch/sm${id}?jsapi=1`
+                        });
+                    }
+                });
+                break;
+            case SoundCloud: {
+                setCache({
+                    key: keyOfVideoInfo,
+                    callback: makeElm2,
+                    getData: save => {
+                        const w = SC.Widget($("<iframe>").appendTo(hHideArea).attr({
+                            src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}`
+                        }).get(0));
+                        w.bind(SC.Widget.Events.READY, () => {
+                            w.getCurrentSound( r => {
+                                const ttl = r.title,
+                                      userName = r.user.username,
+                                      img = r.artwork_url || r.user.avatar_url;
+                                makeElm2(save({ttl,userName,img}));
                             });
-                        }
-                    });
-                    break;
-                case SoundCloud: {
-                    setCache({
-                        key: keyOfVideoInfo,
-                        callback: makeElm2,
-                        getData: save => {
-                            const w = SC.Widget($("<iframe>").appendTo(hHideArea).attr({
-                                src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}`
-                            }).get(0));
-                            w.bind(SC.Widget.Events.READY, () => {
-                                w.getCurrentSound( r => {
-                                    const ttl = r.title,
-                                          userName = r.user.username,
-                                          img = r.artwork_url || r.user.avatar_url;
-                                    makeElm2(save({ttl,userName,img}));
-                                });
-                            });
-                        }
-                    });
-                    break;
-                }
+                        });
+                    }
+                });
+                break;
             }
-        }).then(elm=>{
-            if(g_timeStamp !== timeStamp) return;
-            elm.prependTo(h).on("load",()=>{
-                onLoadFunc({i,id,cover,elm,h});
-                hHideArea.empty();
-                const next = i + 1;
-                if(next < funcList.length) setTimeout(()=>funcList[next](),60/130*1000);
-            }).css({
-                maxHeight: 100,
-            });
-        }).catch(err=>msg(err,true));
-    }
-    function onLoadFunc({i,id,cover,elm,h}){
+        }
+    }).then(elm=>{
         if(g_timeStamp !== timeStamp) return;
-        msg(`Loaded (${i + 1}/${g_list.length})`);
-        h.css({
-            width: elm.width(),
-            height: elm.height()
+        elm.prependTo(h).on("load",()=>{
+            if(g_timeStamp !== timeStamp) return;
+            onLoadFunc({i,id,cover,elm,h});
+            hHideArea.empty();
+            const next = i + 1;
+            if(next < funcList.length) setTimeout(()=>funcList[next](),60/130*1000);
+        }).css({
+            maxHeight: 100,
         });
-        cover.css({
-            position: "absolute",
-            top: 0,
-            left: 0,
-            bottom: 0,
-            right: 0
-        }).on("click",()=>start(i)).on('contextmenu longpress',()=>{
-            if(!isShowingHideArea()) return false;
-            const idx = inputURL().indexOf(id),
-                  e = $("#inputURL").get(0);
-            e.focus();
-            e.setSelectionRange(idx,idx+id.length);
-            return false;
-        });
-    }
+    }).catch(err=>msg(err,true));
+}
+function onLoadFunc({i,id,cover,elm,h}){
+    msg(`Loaded (${i + 1}/${g_list.length})`);
+    h.css({
+        width: elm.width(),
+        height: elm.height()
+    });
+    cover.css({
+        position: "absolute",
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0
+    }).on("click",()=>start(i)).on('contextmenu longpress',()=>{
+        if(!isShowingHideArea()) return false;
+        const idx = inputURL().indexOf(id),
+              e = $("#inputURL").get(0);
+        e.focus();
+        e.setSelectionRange(idx,idx+id.length);
+        return false;
+    });
 }
 const hHideArea = $("<div>").appendTo(h).hide();
 function setCache({key, getData, callback}){
