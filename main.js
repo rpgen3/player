@@ -111,7 +111,8 @@ function loadList(){
             const funcList = g_list.map((v,i)=>{
                 const h = $("<div>").appendTo(hItems).css({
                     position: "relative",
-                    float: "left"
+                    float: "left",
+                    "user-select": "none"
                 });
                 const cover = $("<div>").appendTo(h).addClass("item"),
                       id = v[1];
