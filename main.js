@@ -169,10 +169,7 @@ function loadItem({timeStamp,v,i,id,cover,funcList,h}){
                         new YT.Player($("<div>").appendTo(hHideArea).get(0), {
                             videoId: id,
                             events: {
-                                onReady: e => e.target.playVideo(),
-                                onStateChange: e => {
-                                    if(e.target.getPlayerState() !== YT.PlayerState.PLAYING) return;
-                                    e.target.stopVideo();
+                                onReady: e => {
                                     const data = e.target.getVideoData(),
                                           ttl = data.title,
                                           userName = data.author;
