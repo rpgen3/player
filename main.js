@@ -174,7 +174,7 @@ function loadItem({timeStamp,v,i,id,cover,funcList,h}){
                     }
                 });
                 break;
-            case SoundCloud: {
+            case SoundCloud:
                 setCache({
                     key: keyOfVideoInfo,
                     callback: makeElm2,
@@ -193,7 +193,6 @@ function loadItem({timeStamp,v,i,id,cover,funcList,h}){
                     }
                 });
                 break;
-            }
         }
     }).then(elm=>{
         if(g_timeStamp !== timeStamp) return;
