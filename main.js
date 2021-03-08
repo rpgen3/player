@@ -220,15 +220,23 @@ function onLoadFunc({i,id,cover,elm,h}){
         left: 0,
         bottom: 0,
         right: 0
-    }).on("click",()=>start(i)).on('contextmenu',()=>{
+    }).on("click",()=>start(i)).on('contextmenu longpress',()=>{
         if(!isShowingHideArea()) return false;
         const idx = window.inputURL().indexOf(id),
               e = $("#inputURL").get(0);
         e.focus();
         e.setSelectionRange(idx,idx+id.length);
+        fixScrollTop();
         return false;
     });
 }
+(()=>{
+    const LONGPRESS = 1000;
+    let id;
+    $(window).on("mousedown touchstart",e=>{
+        id = setTimeout(()=>$(e.target).trigger('longpress'), LONGPRESS);
+    }).on("mouseup mouseleave touchend",()=>clearTimeout(id));
+})();
 const hHideArea = $("<div>").appendTo(h).hide();
 function setCache({key, getData, callback}){
     const f = () => getData(obj=>{
