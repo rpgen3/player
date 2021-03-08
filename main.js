@@ -44,6 +44,10 @@ const isAllowedToLoad = [
     rpgen3.addInputBool("#conf",{ title: videoName[SoundCloud], value: true }),
 ];
 $("#conf").append("<br>");
+const showInfoOfYouTubeFlag = rpgen3.addInputBool("#conf",{
+    title: "YouTubeの動画情報も取得する",
+    save: "YouTubeの動画情報も取得する",
+});
 const makeKeyOfPlaylist = (videoType, id) => `playlist#${videoName[videoType]}#${id}`;
 $("<button>").appendTo("#conf").text("playlistのキャッシュをクリア").on("click",()=>{
     if(!confirm("playlistのキャッシュを削除しますか？")) return;
@@ -155,9 +159,28 @@ function loadItem({timeStamp,v,i,id,cover,funcList,h}){
         const makeElm2 = ({ttl,userName,img}) => makeElm({resolve,h,ttl,userName,img}),
               keyOfVideoInfo = `videoInfo#${videoName[v[0]]}#${id}`;
         switch(v[0]){
-            case YouTube:
-                resolve($("<img>").attr({src: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`}));
+            case YouTube: {
+                const img = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+                if(!showInfoOfYouTubeFlag()) return resolve($("<img>").attr({src: img}));
+                setCache({
+                    key: keyOfVideoInfo,
+                    callback: makeElm2,
+                    getData: save => {
+                        new YT.Player($("<div>").appendTo(hHideArea).get(0), {
+                            videoId: id,
+                            events: {
+                                onReady: e => {
+                                    const data = e.target.getVideoData(),
+                                          ttl = data.title,
+                                          userName = data.author;
+                                    makeElm2(save({ttl,userName,img}));
+                                }
+                            }
+                        });
+                    }
+                });
                 break;
+            }
             case Nico:
                 setCache({
                     key: keyOfVideoInfo,
