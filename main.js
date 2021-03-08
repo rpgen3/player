@@ -67,6 +67,7 @@ function msg(str, isError){
 const hItems = $("<div>").appendTo(h).css({
     overflowY: "scroll",
     maxHeight: "40vh",
+    "user-select": "none"
 });
 let g_timeStamp = 0,
     g_firstLoadedFlags = new Array(3).fill(false);
@@ -111,8 +112,7 @@ function loadList(){
             const funcList = g_list.map((v,i)=>{
                 const h = $("<div>").appendTo(hItems).css({
                     position: "relative",
-                    float: "left",
-                    "user-select": "none"
+                    float: "left"
                 });
                 const cover = $("<div>").appendTo(h).addClass("item"),
                       id = v[1];
@@ -223,8 +223,8 @@ function onLoadFunc({i,id,cover,elm,h}){
         highlightVideoID(id);
         return false;
     }).longpress(
-        ()=>highlightVideoID(id),
-        ()=>start(i),
+        () => highlightVideoID(id),
+        e => e.which === 1 ? start(i) : false,
         1000
     );
 }
