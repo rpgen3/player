@@ -513,6 +513,8 @@ function setNico(id){
         allowfullscreen: 1,
         playsinline: 1,
         allow: "autoplay"
+    }).css({
+        border: "none"
     });
 }
 function playFirstNico(id, resolve){
