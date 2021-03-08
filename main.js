@@ -219,7 +219,10 @@ function onLoadFunc({i,id,cover,elm,h}){
         left: 0,
         bottom: 0,
         right: 0
-    }).on('contextmenu',()=>highlightVideoID(id), false).longpress(
+    }).on('contextmenu', () => {
+        highlightVideoID(id);
+        return false;
+    }).longpress(
         ()=>highlightVideoID(id),
         ()=>start(i),
         1000
