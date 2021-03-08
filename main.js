@@ -26,7 +26,7 @@ SoundCloudは埋め込みURLじゃないと使えないので注意
 YouTubeとSoundCloudはplaylistも可
 YouTubeチャンネルのURLも使用可能`,
 };
-$.get("sample.txt",r=>{
+$.get("sample.txt", r => {
     window.inputURL = rpgen3.addInputText("#hideArea",Object.assign({
         save:  "動画URLリスト入力欄",
         value: r
