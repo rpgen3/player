@@ -309,10 +309,11 @@ function judgeURL(str){
               start = s.match(/start ?([0-9]+)/),
               end = s.match(/end ?([0-9]+)/);
         return {
-            start: start ? start[1] : 0,
-            end: end ? end[1] : 0,
+            start: start ? Number(start[1]) : 0,
+            end: end ? Number(end[1]) : 0,
         };
     })();
+    if(range.end <= range.start) range.end = 0;
     const d = rpgen3.getDomain(url).reverse(),
           p = rpgen3.getParam(url);
     let m;
@@ -607,7 +608,7 @@ function playSoundCloud(id, range){
                     scWidget.getPosition(r=>{
                         if(range.end * 1000 < r) playerEnded(SoundCloud);
                     });
-                },100);
+                });
             }
         }
     });
