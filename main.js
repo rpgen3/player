@@ -304,6 +304,15 @@ function getPlaylistSC(resolve, id){
 function judgeURL(str){
     const url = rpgen3.makeArrayURL(str)[0];
     if(!url) return;
+    const range = (()=>{
+        const s = str.replace(url,''),
+              start = s.match(/start ?([0-9]+)/),
+              end = s.match(/end ?([0-9]+)/);
+        return {
+            start: start ? start[1] : 0,
+            end: end ? end[1] : 0,
+        };
+    })();
     const d = rpgen3.getDomain(url).reverse(),
           p = rpgen3.getParam(url);
     let m;
@@ -323,12 +332,12 @@ function judgeURL(str){
             }
             // if(p.search_query) return resolve => getPlaylistYT(resolve, 'search', p.search_query);
             if(!m) m = url.match(/[\?&]v=([A-Za-z0-9_\-]+)/);
-            if(m) return [ YouTube, m[1] ];
+            if(m) return [ YouTube, m[1], range ];
         case "nicovideo.jp":
         case "nico.ms":
             if(!(isAllowedToLoad[Nico]())) return;
             m = url.match(/sm([0-9]+)/);
-            if(m) return [ Nico, m[1] ];
+            if(m) return [ Nico, m[1], range ];
         case "soundcloud.com":
             if(!(isAllowedToLoad[SoundCloud]())) return;
             if(/playlists/.test(url)) {
@@ -336,7 +345,7 @@ function judgeURL(str){
                 if(m) return resolve => getPlaylistSC(resolve, m[1]);
             }
             m = url.match(/\/tracks\/([0-9]+)/);
-            if(m) return [ SoundCloud, m[1] ];
+            if(m) return [ SoundCloud, m[1], range ];
     }
     return console.error("this url is not supported\n" + url);
 }
@@ -421,7 +430,10 @@ function start(id){
             case Nico: return playNico;
             case SoundCloud: return playSoundCloud;
         }
-    })()(r[1]);
+    })()(r[1], Object.assign({
+        start: 0,
+        end: 0
+    }, r[2]));
     fixScrollTop();
 }
 let prevScroll = 0;
@@ -453,6 +465,7 @@ function onResize(elm){
     $(window).off("resize").on("resize",()=>resize(elm)).trigger("resize");
 }
 function resetVideos(next){
+    clearInterval(scID);
     if(whichVideo === next) return;
     hIframe.children().each((i,e)=>$(e).hide());
     pause();
@@ -502,15 +515,19 @@ function playFirstYouTube(id, resolve){
         }
     });
 }
-function playYouTube(id) {
-    g_yt.loadVideoById(id);
+function playYouTube(id, range) {
+    g_yt.loadVideoById({
+        videoId: id,
+        startSeconds: range.start,
+        endSeconds: range.end
+    });
     onResize(iframes[YouTube].find("iframe"));
     showVideo(YouTube);
 }
 const NicoOrigin = 'https://embed.nicovideo.jp';
-function setNico(id){
+function setNico(id, start = 0){
     return iframes[Nico].find("iframe").attr({
-        src: `//embed.nicovideo.jp/watch/sm${id}?jsapi=1`,
+        src: `//embed.nicovideo.jp/watch/sm${id}?jsapi=1&from=${start}`,
         allowfullscreen: 1,
         playsinline: 1,
         allow: "autoplay"
@@ -521,9 +538,11 @@ function setNico(id){
 function playFirstNico(id, resolve){
     setNico(id).on("load", resolve);
 }
-function playNico(id){
-    onResize(setNico(id).on("load",play));
+let endNico;
+function playNico(id, range){
+    onResize(setNico(id, range.start).on("load",play));
     showVideo(Nico);
+    endNico = range.end;
 }
 function postNico(r) {
     iframes[Nico].find("iframe").get(0).contentWindow.postMessage(Object.assign({
@@ -534,7 +553,10 @@ window.addEventListener('message', e => {
     if (e.origin !== NicoOrigin) return;
     const { data } = e.data;
     switch (e.data.eventName) {
-        case 'playerMetadataChange': break;
+        case 'playerMetadataChange': {
+            if(endNico && endNico * 1000 < data.currentTime) playerEnded(Nico);
+            break;
+        }
         case 'playerStatusChange': {
             switch(data.playerStatus){
                 case 2: return setVolume();
@@ -570,7 +592,8 @@ function playFirstSoundCloud(id, resolve){
     scWidget.bind(SC.Widget.Events.READY, resolve);
     scWidget.bind(SC.Widget.Events.FINISH, () => playerEnded(SoundCloud));
 }
-function playSoundCloud(id){
+let scID;
+function playSoundCloud(id, range){
     scWidget.load(`https://api.soundcloud.com/tracks/${id}`, {
         auto_play: false,
         show_teaser: false,
@@ -578,6 +601,14 @@ function playSoundCloud(id){
         callback: () => {
             setVolume();
             play();
+            scWidget.seekTo(range.start * 1000);
+            if(range.end){
+                scID = setInterval(()=>{
+                    scWidget.getPosition(r=>{
+                        if(range.end * 1000 < r) playerEnded(SoundCloud);
+                    });
+                },100);
+            }
         }
     });
     onResize(iframes[SoundCloud].find("iframe"));
