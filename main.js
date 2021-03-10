@@ -504,10 +504,14 @@ const playerEnded = videoType => {
     if(videoType !== whichVideo) return;
     if(endedFlag) return;
     endedFlag = true;
-    setTimeout(()=>{
-        endedFlag = false;
-    },500);
-    repeatPlayFlag() ? (seekTo0(),play()) : next();
+    if(repeatPlayFlag()){
+        seekTo0();
+        play();
+        setTimeout(()=>{
+            endedFlag = true;
+        },1000);
+    }
+    else next();
 }
 let g_yt,
     firstFlagYT = false,
@@ -530,6 +534,7 @@ function playFirstYouTube(id, resolve){
                     e.target.mute();
                 }
                 play();
+                endedFlag = false;
             },
             onStateChange: e => {
                 switch(e.target.getPlayerState()){
@@ -565,7 +570,10 @@ function playFirstNico(id, resolve){
 }
 let endNico;
 function playNico(id, range){
-    onResize(setNico(id, range.start).on("load",play));
+    onResize(setNico(id, range.start).on("load",()=>{
+        play();
+        endedFlag = false;
+    }));
     showVideo(Nico);
     endNico = range.end;
 }
@@ -634,6 +642,7 @@ function playSoundCloud(id, range){
                     playerEnded(SoundCloud);
                 });
             });
+            endedFlag = false;
         }
     });
     onResize(iframes[SoundCloud].find("iframe"));
