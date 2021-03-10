@@ -507,15 +507,10 @@ const playerEnded = videoType => {
     if(repeatPlayFlag()){
         seekTo0();
         play();
-        setTimeout(()=>{
-            endedFlag = true;
-        },1000);
     }
     else next();
 }
-let g_yt,
-    firstFlagYT = false,
-    unmutedFlag = false;
+let g_yt;
 function playFirstYouTube(id, resolve){
     g_yt = new YT.Player($("<div>").appendTo(iframes[YouTube]).get(0), {
         videoId: id,
@@ -524,21 +519,15 @@ function playFirstYouTube(id, resolve){
         },
         events: {
             onReady: e => {
-                if(!firstFlagYT) {
-                    firstFlagYT = true
-                    return resolve();
-                }
-                if(whichVideo !== YouTube) return;
-                if(isSmartPhone && !unmutedFlag) {
-                    unmutedFlag = true;
-                    e.target.mute();
-                }
-                play();
-                endedFlag = false;
+                if(isSmartPhone) e.target.mute();
+                resolve();
             },
             onStateChange: e => {
                 switch(e.target.getPlayerState()){
-                    case YT.PlayerState.PLAYING: return setVolume();
+                    case YT.PlayerState.PLAYING:
+                        setVolume();
+                        endedFlag = false;
+                        break;
                     case YT.PlayerState.ENDED: return playerEnded(YouTube);
                 }
             }
@@ -570,10 +559,7 @@ function playFirstNico(id, resolve){
 }
 let endNico;
 function playNico(id, range){
-    onResize(setNico(id, range.start).on("load",()=>{
-        play();
-        endedFlag = false;
-    }));
+    onResize(setNico(id, range.start).on("load",play));
     showVideo(Nico);
     endNico = range.end;
 }
@@ -592,7 +578,10 @@ window.addEventListener('message', e => {
         }
         case 'playerStatusChange': {
             switch(data.playerStatus){
-                case 2: return setVolume();
+                case 2:
+                    setVolume();
+                    endedFlag = false;
+                    break;
                 case 4: return playerEnded(Nico);
             }
             break;
@@ -633,6 +622,7 @@ function playSoundCloud(id, range){
         visual: true,
         callback: () => {
             setVolume();
+            endedFlag = false;
             play();
             scWidget.seekTo(range.start * 1000);
             if(!range.end) return;
@@ -642,7 +632,6 @@ function playSoundCloud(id, range){
                     playerEnded(SoundCloud);
                 });
             });
-            endedFlag = false;
         }
     });
     onResize(iframes[SoundCloud].find("iframe"));
