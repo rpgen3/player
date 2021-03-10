@@ -79,7 +79,7 @@ function loadList(){
     const timeStamp = +new Date;
     g_timeStamp = timeStamp;
     msg("Now Loading...");
-    Promise.all(window.inputURL().split('\n').filter(v=>v).map(url=>{
+    Promise.all(window.inputURL().split('\n').map(url=>{
         return new Promise((resolve, reject)=>{
             const r = judgeURL(url);
             if(typeof r === "function") r(resolve);
@@ -301,7 +301,8 @@ function getPlaylistSC(resolve, id){
         }
     });
 }
-function judgeURL(url){
+function judgeURL(str){
+    const url = rpgen3.makeArrayURL(str)[0];
     if(!url) return;
     const d = rpgen3.getDomain(url).reverse(),
           p = rpgen3.getParam(url);
