@@ -308,11 +308,12 @@ function judgeURL(str){
     const url = rpgen3.makeArrayURL(str)[0];
     if(!url) return;
     const range = (()=>{
-        const s = str.replace(url,'');
-        let start = s.match(/start ?([0-9.]+)/),
-            end = s.match(/end ?([0-9.]+)/);
+        const s = str.replace(url,''),
+              num = "([0-9]+(\\.[0-9]+)?)";
+        let start = s.match(new RegExp('start ?' + num)),
+            end = s.match(new RegExp('end ?' + num));
         if(!start && !end){
-            const m = s.match(/([0-9.]+) ([0-9.]+)/);
+            const m = s.match(new RegExp(num + ' ' + num));
             if(!m) return false;
             start = m[1];
             end = m[2];
