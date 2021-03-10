@@ -21,10 +21,12 @@ const isShowingHideArea = rpgen3.addHideArea(h,{
 window.paramInputURL = {
     id: "inputURL",
     textarea: true,
-    placeholder: `YouTubeとニコニコ動画とSoundCloudのURL
-SoundCloudは埋め込みURLじゃないと使えないので注意
-YouTubeとSoundCloudはplaylistも可
-YouTubeチャンネルのURLも使用可能`,
+    placeholder: `YouTubeとニコニコ動画とSoundCloudのURLをここに書く。
+SoundCloudは埋め込みURLじゃないと使えないので注意。
+YouTubeとSoundCloudはplaylistも可。
+YouTubeチャンネルのURLも使用可能。
+start [秒] end [秒]をURLの隣に書くと
+曲の開始と終了地点を設定できる。`,
 };
 $.get("sample.txt", r => {
     window.inputURL = rpgen3.addInputText("#hideArea",Object.assign({
@@ -416,6 +418,7 @@ function prev(){
     played.pop();
     start(played[played.length - 1]);
 }
+let g_start;
 function start(id){
     const topId = played[played.length - 1];
     if(id !== topId) played.push(id);
@@ -425,16 +428,18 @@ function start(id){
     setActive(id);
     const r = g_list[id];
     resetVideos(r[0]);
+    const range = Object.assign({
+        start: 0,
+        end: 0
+    }, r[2]);
+    g_start = range.start;
     (()=>{
         switch(r[0]){
             case YouTube: return playYouTube;
             case Nico: return playNico;
             case SoundCloud: return playSoundCloud;
         }
-    })()(r[1], Object.assign({
-        start: 0,
-        end: 0
-    }, r[2]));
+    })()(r[1], range);
     fixScrollTop();
 }
 let prevScroll = 0;
@@ -484,7 +489,7 @@ const hIframe = $("<div>").appendTo(h),
           $("<div>").appendTo(hIframe).hide().append("<iframe>"),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
-const playerEnded = videoType => videoType !== whichVideo ? null : repeatPlayFlag() ? play() : next();
+const playerEnded = videoType => videoType !== whichVideo ? null : repeatPlayFlag() ? (seekTo0(),play()) : next();
 let g_yt,
     firstFlagYT = false,
     unmutedFlag = false;
@@ -654,8 +659,8 @@ function pause(){
 }
 function seekTo0(){
     switch(whichVideo){
-        case YouTube: return g_yt.seekTo(0);
-        case Nico: return postNico({ eventName: "seek", data: { time: 0 } });
-        case SoundCloud: return scWidget.seekTo(0);
+        case YouTube: return g_yt.seekTo(g_start.start);
+        case Nico: return postNico({ eventName: "seek", data: { time: g_start.start * 1000 } });
+        case SoundCloud: return scWidget.seekTo(g_start.start * 1000);
     }
 }
