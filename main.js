@@ -24,9 +24,10 @@ window.paramInputURL = {
     placeholder: `YouTubeとニコニコ動画とSoundCloudのURLをここに書く。
 SoundCloudは埋め込みURLじゃないと使えないので注意。
 YouTubeとSoundCloudはplaylistも可。
-YouTubeチャンネルのURLも使用可能。
+YouTubeチャンネルのURLも可。
 start [秒] end [秒]をURLの隣に書くと
-曲の開始と終了地点を設定できる。`,
+曲の開始と終了地点を設定できる。
+[秒] [秒]の省略形も可。`,
 };
 $.get("sample.txt", r => {
     window.inputURL = rpgen3.addInputText("#hideArea",Object.assign({
@@ -308,10 +309,10 @@ function judgeURL(str){
     if(!url) return;
     const range = (()=>{
         const s = str.replace(url,'');
-        let start = s.match(/start ?([0-9]+)/),
-            end = s.match(/end ?([0-9]+)/);
+        let start = s.match(/start ?([0-9.]+)/),
+            end = s.match(/end ?([0-9.]+)/);
         if(!start && !end){
-            const m = s.match(/([0-9]+) ([0-9]+)/);
+            const m = s.match(/([0-9.]+) ([0-9.]+)/);
             if(!m) return false;
             start = m[1];
             end = m[2];
