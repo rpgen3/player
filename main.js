@@ -669,8 +669,8 @@ function pause(){
 }
 function seekTo0(){
     switch(whichVideo){
-        case YouTube: return g_yt.seekTo(g_start.start);
-        case Nico: return postNico({ eventName: "seek", data: { time: g_start.start * 1000 } });
-        case SoundCloud: return scWidget.seekTo(g_start.start * 1000);
+        case YouTube: return g_yt.seekTo(g_start);
+        case Nico: return postNico({ eventName: "seek", data: { time: g_start * 1000 } });
+        case SoundCloud: return scWidget.seekTo(g_start * 1000);
     }
 }
