@@ -307,12 +307,22 @@ function judgeURL(str){
     const url = rpgen3.makeArrayURL(str)[0];
     if(!url) return;
     const range = (()=>{
-        const s = str.replace(url,''),
-              start = s.match(/start ?([0-9]+)/),
-              end = s.match(/end ?([0-9]+)/);
+        const s = str.replace(url,'');
+        let start = s.match(/start ?([0-9]+)/),
+            end = s.match(/end ?([0-9]+)/);
+        if(!start && !end){
+            const m = s.match(/([0-9]+) ([0-9]+)/);
+            if(!m) return false;
+            start = m[1];
+            end = m[2];
+        }
+        else {
+            start = start ? start[1] : 0;
+            end = end ? end[1] : 0;
+        }
         return {
-            start: start ? Number(start[1]) : 0,
-            end: end ? Number(end[1]) : 0,
+            start: Number(start),
+            end: Number(end)
         };
     })();
     if(range.end <= range.start) range.end = 0;
