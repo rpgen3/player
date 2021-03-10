@@ -482,9 +482,9 @@ function onResize(elm){
 }
 function resetVideos(next){
     clearInterval(scID);
+    pause();
     if(whichVideo === next) return;
     hIframe.children().each((i,e)=>$(e).hide());
-    pause();
 }
 let whichVideo;
 function showVideo(videoType){
@@ -499,7 +499,16 @@ const hIframe = $("<div>").appendTo(h),
           $("<div>").appendTo(hIframe).hide().append("<iframe>"),
       ],
       isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
-const playerEnded = videoType => videoType !== whichVideo ? null : repeatPlayFlag() ? (seekTo0(),play()) : next();
+let endedFlag = false;
+const playerEnded = videoType => {
+    if(videoType !== whichVideo) return;
+    if(endedFlag) return;
+    endedFlag = true;
+    setTimeout(()=>{
+        endedFlag = false;
+    },500);
+    repeatPlayFlag() ? (seekTo0(),play()) : next();
+}
 let g_yt,
     firstFlagYT = false,
     unmutedFlag = false;
@@ -618,13 +627,13 @@ function playSoundCloud(id, range){
             setVolume();
             play();
             scWidget.seekTo(range.start * 1000);
-            if(range.end){
-                scID = setInterval(()=>{
-                    scWidget.getPosition(r=>{
-                        if(range.end * 1000 < r) playerEnded(SoundCloud);
-                    });
+            if(!range.end) return;
+            scID = setInterval(()=>{
+                scWidget.getPosition(r=>{
+                    if(range.end * 1000 > r) return;
+                    playerEnded(SoundCloud);
                 });
-            }
+            });
         }
     });
     onResize(iframes[SoundCloud].find("iframe"));
