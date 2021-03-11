@@ -58,9 +58,9 @@ SoundCloud上で欲しいtrackやplaylistのページに移動した後
         if(!confirm("この内容で送信しますか？")) return;
         const ttl = inputTtl(),
               txt = inputText();
-        if(!ttl || !txt) return alert("空欄があります。");
-        if((ttl + txt).length > 1800) {
-            return alert(`文字列の長さが1800文字を超えています！`);
+        if(!txt) return alert("本文が空欄です。");
+        if(txt.length > 1900) {
+            return alert(`本文の長さが1900文字を超えています！`);
         }
         send(`${'#'.repeat(40)}
 @everyone
