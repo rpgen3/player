@@ -27,7 +27,7 @@
         if(p.user) $.get(`user/${p.user}.txt`, makeNewInputURL);
         else if(p.imgur){
             imgur.load(p.imgur).then(img => makeNewInputURL(imgToStr(img)))
-                .catch((e)=>alert("共有データの読み込みに失敗しました。"));
+                .catch((e)=>msg("共有データの読み込みに失敗しました。", true));
         }
     },500);
     function makeNewInputURL(value){
