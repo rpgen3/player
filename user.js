@@ -6,13 +6,12 @@
               if(!rpgen3.makeArrayURL(input).length) return alert("共有する内容がありません。");
               btn.attr("disabled", true);
               imgur.upload(strToImg(input)).then(({id, deleteFunc})=>{
-                  $("<button>").appendTo(h).text("共有停止").on("click", function(){
+                  $("<button>").appendTo(output).text("共有停止").on("click", () => {
                       deleteFunc();
-                      $(this).remove();
                       output.empty();
                       btn.attr("disabled", false);
                   });
-                  rpgen3.addInputText(output.empty(),{
+                  rpgen3.addInputText(output,{
                       readonly: true,
                       title: "共有用URL",
                       value: `https://rpgen3.github.io/player/?imgur=${id}`
@@ -22,8 +21,7 @@
                   btn.attr("disabled", false);
               });
           });
-    const btnArea = $("<div>").appendTo(h),
-          output = $("<div>").appendTo(h);
+    const output = $("<span>").appendTo(h);
     setTimeout(()=>{
         const p = rpgen3.getParam();
         if(p.user) $.get(`user/${p.user}.txt`, makeNewInputURL);
