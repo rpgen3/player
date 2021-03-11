@@ -68,9 +68,9 @@ ttl
 ${'`'.repeat(3)}
 ${ttl}
 ${'`'.repeat(3)}
-list
+txt
 ${'`'.repeat(3)}
-${list}
+${txt}
 ${'`'.repeat(3)}
 ${'#'.repeat(40)}`);
         hh.text("送信しました。");
