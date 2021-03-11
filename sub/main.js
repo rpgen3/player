@@ -17,7 +17,7 @@
     text(`上のブックマークレットを登録して使ってください。
 SoundCloud上で欲しいtrackやplaylistのページに移動した後
 ページ更新してから実行してください。`);
-    $("<h2>").appendTo(h).text("便利な共有機能");
+    $("<h2>").appendTo(h).text("共有機能について");
     blue("https://rpgen3.github.io/player/");
     black("にクエリパラメータをつけることで");
     h.append("<br>");
@@ -37,7 +37,6 @@ SoundCloud上で欲しいtrackやplaylistのページに移動した後
     black("とURLに付け加えると完成です。");
     h.append("<br>");
     black("他人がそのURLにアクセスしても同じリストが入ります。");
-    h.append("<br><br>");
     $("<h3>").appendTo(h).text("報告フォーム");
     black("なんかあればよろ");
     const inputTtl = rpgen3.addSelect(h,{
