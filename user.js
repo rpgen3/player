@@ -2,8 +2,10 @@
     const imgur = window.imgur,
           h = $("<div>").prependTo("#hideArea"),
           btn = $("<button>").appendTo(h).text("共有").on("click",()=>{
+              const input = window.inputURL();
+              if(!rpgen3.makeArrayURL(input).length) return alert("共有する内容がありません。");
               btn.attr("disabled", true);
-              imgur.upload(strToImg(window.inputURL())).then(({id, deleteFunc})=>{
+              imgur.upload(strToImg(input)).then(({id, deleteFunc})=>{
                   $("<button>").appendTo(h).text("共有停止").on("click", function(){
                       deleteFunc();
                       $(this).remove();
