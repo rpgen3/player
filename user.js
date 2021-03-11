@@ -3,7 +3,7 @@
           h = $("<div>").prependTo("#hideArea"),
           btn = $("<button>").appendTo(h).text("共有").on("click",()=>{
               btn.attr("disabled", true);
-              imgur.upload(strToImg(window.inputURL())).then((id,deleteFunc)=>{
+              imgur.upload(strToImg(window.inputURL())).then(({id, deleteFunc})=>{
                   $("<button>").appendTo(h).text("共有停止").on("click", function(){
                       deleteFunc();
                       $(this).remove();
