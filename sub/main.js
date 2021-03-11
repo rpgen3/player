@@ -39,6 +39,7 @@ SoundCloud上で欲しいtrackやplaylistのページに移動した後
     black("他人がそのURLにアクセスしても同じリストが入ります。");
     h.append("<br><br>");
     $("<h3>").appendTo(h).text("報告フォーム");
+    black("なんかあればよろ");
     const inputTtl = rpgen3.addSelect(h,{
         title: "件名",
         list: [
