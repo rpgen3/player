@@ -36,7 +36,7 @@ $.get("sample.txt", r => {
     }, window.paramInputURL));
 });
 h.append("<br>");
-$("<button>").appendTo(h).text("リストを読み込む").on("click",loadList);
+$("<button>").appendTo(h).text("リストを読み込む").on("click",loadList).attr("id","loadBtn");
 rpgen3.addHideArea(h,{
     title: "読み込み設定",
     id2: "conf"
