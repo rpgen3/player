@@ -126,8 +126,9 @@ function loadList(){
                 return () => loadItem({timeStamp,v,i,id,cover,funcList,h});
             });
             funcList[0]();
-            unplayed = prevIdx = null;
+            prevIdx = null;
             while(played.length) played.pop();
+            unplayed = new Unplayed();
             start(0);
         }
     }).catch(err=>msg(err,true));
@@ -400,10 +401,6 @@ class Unplayed {
 let unplayed;
 function getRandom(){
     if(!g_list.length) return;
-    if(!unplayed){
-        unplayed = new Unplayed();
-        return getRandom();
-    }
     const result = unplayed.random();
     if(false === result) {
         unplayed = new Unplayed();
@@ -434,7 +431,7 @@ function start(id){
     const topId = played[played.length - 1];
     if(id !== topId) played.push(id);
     prevBtn.attr("disabled", played.length < 2);
-    if(unplayed) unplayed.exclude(id);
+    unplayed.exclude(id);
     g_idx = id;
     setActive(id);
     const r = g_list[id];
