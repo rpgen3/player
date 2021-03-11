@@ -315,8 +315,7 @@ function judgeURL(str){
         if(!start && !end){
             const m = s.match(new RegExp(num + ' ' + num));
             if(!m) return false;
-            start = m[1];
-            end = m[2];
+            [ start, end ] = m[0].split(' ');
         }
         else {
             start = start ? start[1] : 0;
