@@ -18,7 +18,6 @@ const isShowingHideArea = rpgen3.addHideArea(h,{
     title: "動画URLリスト入力欄",
     id2: "hideArea"
 });
-$("<div>").appendTo("#hideArea").attr("id","sharingFrame");
 window.paramInputURL = {
     id: "inputURL",
     textarea: true,
