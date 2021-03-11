@@ -7,6 +7,7 @@
                   $("<button>").appendTo(h).text("共有停止").on("click", function(){
                       deleteFunc();
                       $(this).remove();
+                      output.empty();
                       btn.attr("disabled", false);
                   });
                   rpgen3.addInputText(output.empty(),{
