@@ -4,12 +4,12 @@
           btn = $("<button>").appendTo(h).text("共有").on("click",()=>{
               const input = window.inputURL();
               if(!rpgen3.makeArrayURL(input).length) return alert("共有する内容がありません。");
-              btn.attr("disabled", true);
+              btn.attr("disabled", true).hide();
               imgur.upload(strToImg(input)).then(({id, deleteFunc})=>{
                   $("<button>").appendTo(output).text("共有停止").on("click", () => {
                       deleteFunc();
                       output.empty();
-                      btn.attr("disabled", false);
+                      btn.attr("disabled", false).show();
                   });
                   rpgen3.addInputText($("<div>").appendTo(output),{
                       readonly: true,
@@ -18,7 +18,7 @@
                   });
               }).catch(()=>{
                   alert("アップロードできませんでした。");
-                  btn.attr("disabled", false);
+                  btn.attr("disabled", false).show();
               });
           });
     const output = $("<span>").appendTo(h);
