@@ -7,15 +7,16 @@
               btn.attr("disabled", true);
               imgur.upload(strToImg(input)).then(({ id, dhash, token })=>{
                   makeDeleteBtn(dhash, token);
+                  const url = `https://rpgen3.github.io/player/?imgur=${id}`;
                   rpgen3.addInputText(output,{
                       readonly: true,
                       title: "共有用URL",
-                      value: `https://rpgen3.github.io/player/?imgur=${id}`
+                      value: url
                   });
                   rpgen3.addInputText(output,{
                       readonly: true,
                       title: "削除用URL",
-                      value: `https://rpgen3.github.io/player/?imgur=${id}&dhash=${dhash}&token=${token}`
+                      value: url + `&dhash=${dhash}&token=${token}`
                   });
               }).catch(()=>{
                   alert("アップロードできませんでした。");
