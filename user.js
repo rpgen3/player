@@ -1,47 +1,37 @@
-setTimeout(()=>{
-    const p = rpgen3.getParam();
-    if(p.user) $.get(`user/${p.user}.txt`, makeNewInputURL);
-    else if(p.imgur){
-        $("<img>").on("load", function(){
-            makeNewInputURL(loadImg(this));
-        }).attr({
-            crossOrigin: "anonymous",
-            src: `https://i.imgur.com/${p.imgur}.png`
-        });
-    }
-},500);
-function makeNewInputURL(value){
-    window.inputURL = rpgen3.addInputText($("#hideArea").empty(),Object.assign({
-        value: value
-    }, window.paramInputURL));
-}
-function loadImg(img){
-    const width = img.width,
-          height = img.height,
-          cv = $("<canvas>").attr({
-              width: width,
-              height: height
-          }),
-          ctx = cv.get(0).getContext('2d');
-    ctx.drawImage(img,0,0);
-    const data = ctx.getImageData(0, 0, width, height).data,
-          ar = [];
-    for(let i = 0; i < data.length; i++){
-        const i4 = i * 4;
-        for(let o = 0; o < 3; o++){
-            ar.push(data[i4 + o]);
+(()=>{
+    const imgur = window.imgur,
+          h = $("<div>").prependTo("#hideArea"),
+          btn = $("<button>").appendTo(h).text("共有").on("click",()=>{
+              btn.attr("disabled", true);
+              imgur.upload(strToImg(window.inputURL())).then((id,deleteFunc)=>{
+                  $("<button>").appendTo(h).text("共有停止").on("click", function(){
+                      deleteFunc();
+                      $(this).remove();
+                      btn.attr("disabled", false);
+                  });
+                  rpgen3.addInputText(output.empty(),{
+                      readonly: true,
+                      title: "共有用URL",
+                      value: `https://rpgen3.github.io/player/?imgur=${id}`
+                  });
+              }).catch((e)=>{
+                  alert("アップロードできませんでした。");
+                  btn.attr("disabled", false);
+              });
+          });
+    const btnArea = $("<div>").appendTo(h),
+          output = $("<div>").appendTo(h);
+    setTimeout(()=>{
+        const p = rpgen3.getParam();
+        if(p.user) $.get(`user/${p.user}.txt`, makeNewInputURL);
+        else if(p.imgur){
+            imgur.load(p.imgur).then(img => makeNewInputURL(imgToStr(img)))
+                .catch((e)=>alert("共有データの読み込みに失敗しました。"));
         }
+    },500);
+    function makeNewInputURL(value){
+        window.inputURL = rpgen3.addInputText($("#hideArea").last().remove(),Object.assign({
+            value: value
+        }, window.paramInputURL));
     }
-    let str = '';
-    for(let p = 0; p < ar.length; p++){
-        const n = ar[p];
-        if(n < 128){
-            str += String.fromCharCode(n);
-        }
-        else if(n === 128){
-            str += String.fromCharCode((ar[p + 1] << 8) + ar[p + 2]);
-            p += 2;
-        }
-    }
-    return str.replace(/\0+$/,'');
-}
+})();
