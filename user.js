@@ -30,7 +30,7 @@
         }
     },500);
     function makeNewInputURL(value){
-        window.inputURL = rpgen3.addInputText($("#hideArea").last().remove(),Object.assign({
+        window.inputURL = rpgen3.addInputText($("#hideArea").children().last().remove(), Object.assign({
             value: value
         }, window.paramInputURL));
     }
