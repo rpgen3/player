@@ -15,7 +15,7 @@
                       title: "共有用URL",
                       value: `https://rpgen3.github.io/player/?imgur=${id}`
                   });
-              }).catch((e)=>{
+              }).catch(()=>{
                   alert("アップロードできませんでした。");
                   btn.attr("disabled", false);
               });
@@ -27,7 +27,7 @@
         if(p.user) $.get(`user/${p.user}.txt`, makeNewInputURL);
         else if(p.imgur){
             imgur.load(p.imgur).then(img => makeNewInputURL(imgToStr(img)))
-                .catch((e)=>msg("共有データの読み込みに失敗しました。", true));
+                .catch(()=>msg("共有データの読み込みに失敗しました。", true));
         }
     },500);
     function makeNewInputURL(value){
