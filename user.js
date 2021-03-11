@@ -11,7 +11,7 @@
                       output.empty();
                       btn.attr("disabled", false);
                   });
-                  rpgen3.addInputText(output,{
+                  rpgen3.addInputText($("<div>").appendTo(output),{
                       readonly: true,
                       title: "共有用URL",
                       value: `https://rpgen3.github.io/player/?imgur=${id}`
