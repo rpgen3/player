@@ -688,6 +688,8 @@ function pause(){
     }
 }
 function seekTo0(){
+    g_transition.quit();
+    makeTransition();
     switch(whichVideo){
         case YouTube: return g_yt.seekTo(g_start);
         case Nico: return postNico({ eventName: "seek", data: { time: g_start * 1000 } });
@@ -703,14 +705,12 @@ class TransitionOfSoundVolume {
         this.sec = sec * 1000;
         this.elm = hInputVolume.find("input").attr("disabled", true);
         this.max = this.elm.val();
-        this.elm.val(0);
+        this.setValue = v => this.elm.val(v).trigger("change");
+        this.setValue(0);
         this.unit = 100;
         this.id = setInterval(()=>this.main(), this.unit);
         this.count = 0;
         this.key = getInputVolumeKey();
-    }
-    setValue(v){
-        this.elm.val(v).trigger("change");
     }
     main(){
         const loopNum = this.sec / this.unit;
