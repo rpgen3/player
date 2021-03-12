@@ -27,9 +27,8 @@ YouTubeとSoundCloudはplaylistも可。
 YouTubeチャンネルのURLも可。
 ★コマンドについて
 URLの隣に書くとこれらのコマンドが発動します。
-start [秒] end [秒] … 曲の開始と終了地点を設定できる。
-[秒] [秒]の省略形も可。
-volume [0~100] … 音量を強制的に変更する。`,
+start [秒] end [秒] … 開始と終了地点を設定。[秒] [秒]の省略形も可。
+rate [%] … 音量に補正をかける。0～100%までの範囲のみ有効。`,
 };
 $.get("sample.txt", r => {
     window.inputURL = rpgen3.addInputText("#hideArea",Object.assign({
@@ -311,13 +310,11 @@ function analyzeCmd(s){
     const num = "([0-9]+(\\.[0-9]+)?)";
     let start = s.match(new RegExp('start ?' + num)),
         end = s.match(new RegExp('end ?' + num)),
-        volume = s.match(new RegExp('volume ?' + num));
-    if(volume){
-        volume = Number(volume[1]);
-        if(volume < 0) volume = 0;
-        else if(volume > 100) volume = 100;
+        rate = s.match(new RegExp('rate ?' + num));
+    if(rate){
+        rate = Number(rate[1]);
+        if(rate > 100) rate = 100;
     }
-    else volume = null;
     if(!start && !end){
         const m = s.match(new RegExp(num + ' ' + num));
         [ start, end ] = m ? m[0].split(' ') : [ 0, 0 ];
@@ -330,7 +327,7 @@ function analyzeCmd(s){
     return {
         start: Number(start),
         end: Number(end),
-        volume: volume
+        rate: rate
     };
 }
 function judgeURL(str){
@@ -448,7 +445,7 @@ function start(id){
     g_cmd = Object.assign({
         start: 0,
         end: 0,
-        volume: null
+        rate: 100
     }, r[2]);
     (()=>{
         switch(r[0]){
@@ -646,31 +643,20 @@ function playSoundCloud(id){
 }
 let inputVolume;
 function makeInputVolume(){
-    const ttl = videoName[whichVideo] + "の音量",
-          f = p => rpgen3.addInputRange(hInputVolume.empty(), Object.assign({
-              min: 0,
-              max: 100,
-              value: 50,
-              step: 1,
-              change: setVolume,
-          }, p));
-    if(g_cmd.volume !== null){
-        inputVolume = f({
-            title: ttl + "(固定)",
-            value: g_cmd.volume
-        });
-        hInputVolume.find("input").attr("disabled", true);
-    }
-    else {
-        inputVolume = f({
-            title: ttl,
-            save: ttl
-        });
-    }
+    const ttl = videoName[whichVideo] + "の音量";
+    inputVolume = rpgen3.addInputRange(hInputVolume.empty(),{
+        title: ttl + (g_cmd.rate !== 100 ? `(${g_cmd.rate}%)` : ''),
+        save: ttl,
+        min: 0,
+        max: 100,
+        value: 50,
+        step: 1,
+        change: setVolume
+    });
 }
 function setVolume(){
     if(!inputVolume) return;
-    const v = inputVolume();
+    const v = inputVolume() * g_cmd.rate/100;
     switch(whichVideo){
         case YouTube: return g_yt.setVolume(v);
         case Nico: return postNico({eventName: 'volumeChange', data: { volume: v/100 } });
