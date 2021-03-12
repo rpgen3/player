@@ -644,10 +644,8 @@ function playSoundCloud(id){
     showVideo(SoundCloud);
 }
 let inputVolume;
-const getInputVolumeKey = () => videoName[whichVideo] + "の音量";
 function makeInputVolume(){
-    const ttl = getInputVolumeKey();
-    inputVolume = null;
+    const ttl = videoName[whichVideo] + "の音量";
     inputVolume = rpgen3.addInputRange(hInputVolume.empty(),{
         title: ttl,
         save: ttl,
