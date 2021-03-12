@@ -646,21 +646,32 @@ function playSoundCloud(id){
 }
 let inputVolume;
 function makeInputVolume(){
-    const ttl = videoName[whichVideo] + "の音量";
-    inputVolume = rpgen3.addInputRange(hInputVolume.empty(),{
-        title: ttl,
-        save: ttl,
+    const f = p => rpgen3.addInputRange(hInputVolume.empty(), Object.assign({
         min: 0,
         max: 100,
         value: 50,
-        step: 1,
-        change: setVolume
-    });
+        step: 1
+    }, p));
+    const ttl = videoName[whichVideo] + "の音量";
+    if(g_cmd.volume !== null){
+        inputVolume = f({
+            change: setVolume,
+            title: ttl + "(固定)",
+            value: g_cmd.volume
+        });
+        hInputVolume.find("input").attr("disabled", true);
+    }
+    else {
+        inputVolume = f({
+            change: setVolume,
+            title: ttl,
+            save: ttl
+        });
+    }
 }
 function setVolume(){
     if(!inputVolume) return;
-    const d = b => hInputVolume.find("input").attr("disabled", b),
-          v = g_cmd.volume !== null ? (d(true), g_cmd.volume) : (d(false), inputVolume());
+    const v = inputVolume();
     switch(whichVideo){
         case YouTube: return g_yt.setVolume(v);
         case Nico: return postNico({eventName: 'volumeChange', data: { volume: v/100 } });
