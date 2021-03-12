@@ -646,16 +646,16 @@ function playSoundCloud(id){
 }
 let inputVolume;
 function makeInputVolume(){
-    const f = p => rpgen3.addInputRange(hInputVolume.empty(), Object.assign({
-        min: 0,
-        max: 100,
-        value: 50,
-        step: 1
-    }, p));
-    const ttl = videoName[whichVideo] + "の音量";
+    const ttl = videoName[whichVideo] + "の音量",
+          f = p => rpgen3.addInputRange(hInputVolume.empty(), Object.assign({
+              min: 0,
+              max: 100,
+              value: 50,
+              step: 1,
+              change: setVolume,
+          }, p));
     if(g_cmd.volume !== null){
         inputVolume = f({
-            change: setVolume,
             title: ttl + "(固定)",
             value: g_cmd.volume
         });
@@ -663,7 +663,6 @@ function makeInputVolume(){
     }
     else {
         inputVolume = f({
-            change: setVolume,
             title: ttl,
             save: ttl
         });
