@@ -305,30 +305,38 @@ function getPlaylistSC(resolve, id){
         }
     });
 }
+function analyzeCmd(s){
+    const num = "([0-9]+(\\.[0-9]+)?)";
+    let start = s.match(new RegExp('start ?' + num)),
+        end = s.match(new RegExp('end ?' + num)),
+        volume = s.match(new RegExp('volume ?' + num));
+    if(volume){
+        const n = Number(volume[1]);
+        if(n < 0) volume = 0;
+        else if(n > 100) volume = 100;
+    }
+    else volume = null;
+    if(!start && !end){
+        const m = s.match(new RegExp(num + ' ' + num));
+        if(!m) return false;
+        [ start, end ] = m[0].split(' ');
+    }
+    else {
+        start = start ? start[1] : 0;
+        end = end ? end[1] : 0;
+    }
+    if(end <= start) end = 0;
+    return {
+        start: Number(start),
+        end: Number(end),
+        volume: volume
+    };
+}
 function judgeURL(str){
     const url = rpgen3.makeArrayURL(str)[0];
     if(!url) return;
-    const range = (()=>{
-        const s = str.replace(url,''),
-              num = "([0-9]+(\\.[0-9]+)?)";
-        let start = s.match(new RegExp('start ?' + num)),
-            end = s.match(new RegExp('end ?' + num));
-        if(!start && !end){
-            const m = s.match(new RegExp(num + ' ' + num));
-            if(!m) return false;
-            [ start, end ] = m[0].split(' ');
-        }
-        else {
-            start = start ? start[1] : 0;
-            end = end ? end[1] : 0;
-        }
-        return {
-            start: Number(start),
-            end: Number(end)
-        };
-    })();
-    if(range.end <= range.start) range.end = 0;
-    const d = rpgen3.getDomain(url).reverse(),
+    const cmd = analyzeCmd(str.replace(url,'')),
+          d = rpgen3.getDomain(url).reverse(),
           p = rpgen3.getParam(url);
     let m;
     switch(d[1] + '.' + d[0]){
@@ -347,12 +355,12 @@ function judgeURL(str){
             }
             // if(p.search_query) return resolve => getPlaylistYT(resolve, 'search', p.search_query);
             if(!m) m = url.match(/[\?&]v=([A-Za-z0-9_\-]+)/);
-            if(m) return [ YouTube, m[1], range ];
+            if(m) return [ YouTube, m[1], cmd ];
         case "nicovideo.jp":
         case "nico.ms":
             if(!(isAllowedToLoad[Nico]())) return;
             m = url.match(/sm([0-9]+)/);
-            if(m) return [ Nico, m[1], range ];
+            if(m) return [ Nico, m[1], cmd ];
         case "soundcloud.com":
             if(!(isAllowedToLoad[SoundCloud]())) return;
             if(/playlists/.test(url)) {
@@ -360,7 +368,7 @@ function judgeURL(str){
                 if(m) return resolve => getPlaylistSC(resolve, m[1]);
             }
             m = url.match(/\/tracks\/([0-9]+)/);
-            if(m) return [ SoundCloud, m[1], range ];
+            if(m) return [ SoundCloud, m[1], cmd ];
     }
     return console.error("this url is not supported\n" + url);
 }
@@ -426,7 +434,7 @@ function prev(){
     played.pop();
     start(played[played.length - 1]);
 }
-let g_start;
+let g_cmd;
 function start(id){
     const topId = played[played.length - 1];
     if(id !== topId) played.push(id);
@@ -436,18 +444,18 @@ function start(id){
     setActive(id);
     const r = g_list[id];
     resetVideos(r[0]);
-    const range = Object.assign({
+    g_cmd = Object.assign({
         start: 0,
-        end: 0
+        end: 0,
+        volume: null
     }, r[2]);
-    g_start = range.start;
     (()=>{
         switch(r[0]){
             case YouTube: return playYouTube;
             case Nico: return playNico;
             case SoundCloud: return playSoundCloud;
         }
-    })()(r[1], range);
+    })()(r[1]);
     fixScrollTop();
 }
 let prevScroll = 0;
@@ -532,11 +540,11 @@ function playFirstYouTube(id, resolve){
         }
     });
 }
-function playYouTube(id, range) {
+function playYouTube(id) {
     g_yt.loadVideoById({
         videoId: id,
-        startSeconds: range.start,
-        endSeconds: range.end
+        startSeconds: g_cmd.start,
+        endSeconds: g_cmd.end
     });
     onResize(iframes[YouTube].find("iframe"));
     showVideo(YouTube);
@@ -556,10 +564,10 @@ function playFirstNico(id, resolve){
     setNico(id).on("load", resolve);
 }
 let endNico;
-function playNico(id, range){
-    onResize(setNico(id, range.start).on("load",play));
+function playNico(id){
+    onResize(setNico(id, g_cmd.start).on("load",play));
     showVideo(Nico);
-    endNico = range.end;
+    endNico = g_cmd.end;
 }
 function postNico(r) {
     iframes[Nico].find("iframe").get(0).contentWindow.postMessage(Object.assign({
@@ -613,7 +621,7 @@ function playFirstSoundCloud(id, resolve){
     scWidget.bind(SC.Widget.Events.FINISH, () => playerEnded(SoundCloud));
 }
 let scID;
-function playSoundCloud(id, range){
+function playSoundCloud(id){
     scWidget.load(`https://api.soundcloud.com/tracks/${id}`, {
         auto_play: false,
         show_teaser: false,
@@ -622,11 +630,11 @@ function playSoundCloud(id, range){
             setVolume();
             endedFlag = false;
             play();
-            scWidget.seekTo(range.start * 1000);
-            if(!range.end) return;
+            scWidget.seekTo(g_cmd.start * 1000);
+            if(!g_cmd.end) return;
             scID = setInterval(()=>{
                 scWidget.getPosition(r=>{
-                    if(range.end * 1000 > r) return;
+                    if(g_cmd.end * 1000 > r) return;
                     playerEnded(SoundCloud);
                 });
             });
@@ -652,7 +660,8 @@ function makeInputVolume(){
 }
 function setVolume(){
     if(!inputVolume) return;
-    const v = inputVolume();
+    const d = b => hInputVolume.find("input").attr("disabled", b),
+          v = g_cmd.volume !== null ? (d(true), g_cmd.volume) : (d(false), inputVolume());
     switch(whichVideo){
         case YouTube: return g_yt.setVolume(v * 100);
         case Nico: return postNico({eventName: 'volumeChange', data: { volume: v } });
@@ -674,9 +683,10 @@ function pause(){
     }
 }
 function seekTo0(){
+    const s = g_cmd.start;
     switch(whichVideo){
-        case YouTube: return g_yt.seekTo(g_start);
-        case Nico: return postNico({ eventName: "seek", data: { time: g_start * 1000 } });
-        case SoundCloud: return scWidget.seekTo(g_start * 1000);
+        case YouTube: return g_yt.seekTo(s);
+        case Nico: return postNico({ eventName: "seek", data: { time: s * 1000 } });
+        case SoundCloud: return scWidget.seekTo(s * 1000);
     }
 }
