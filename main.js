@@ -384,19 +384,6 @@ const shuffleFlag = rpgen3.addInputBool(h,{
 $("<button>").appendTo(h).text("再生").on("click",play);
 $("<button>").appendTo(h).text("一時停止").on("click",pause);
 $("<button>").appendTo(h).text("最初から").on("click",seekTo0);
-const inputSecTransition = rpgen3.addSelect(h,{
-    title: "遷移時の音量調整",
-    save: "遷移時の音量調整",
-    list: {
-        "0秒": 0,
-        "1秒": 1,
-        "2秒": 2,
-        "3秒": 3,
-        "4秒": 4,
-        "5秒": 5,
-    },
-    value: 3,
-});
 const hInputVolume = $("<div>").appendTo(h);
 class Unplayed {
     constructor(){
@@ -536,7 +523,7 @@ function playFirstYouTube(id, resolve){
             onStateChange: e => {
                 switch(e.target.getPlayerState()){
                     case YT.PlayerState.PLAYING:
-                        makeTransition();
+                        setVolume();
                         endedFlag = false;
                         break;
                     case YT.PlayerState.ENDED: return playerEnded(YouTube);
@@ -590,7 +577,7 @@ window.addEventListener('message', e => {
         case 'playerStatusChange': {
             switch(data.playerStatus){
                 case 2:
-                    makeTransition();
+                    setVolume();
                     endedFlag = false;
                     break;
                 case 4: return playerEnded(Nico);
@@ -632,7 +619,7 @@ function playSoundCloud(id, range){
         show_teaser: false,
         visual: true,
         callback: () => {
-            makeTransition();
+            setVolume();
             endedFlag = false;
             play();
             scWidget.seekTo(range.start * 1000);
@@ -651,7 +638,6 @@ function playSoundCloud(id, range){
 let inputVolume;
 const getInputVolumeKey = () => videoName[whichVideo] + "の音量";
 function makeInputVolume(){
-    if(g_transition) g_transition.quit();
     const ttl = getInputVolumeKey();
     inputVolume = null;
     inputVolume = rpgen3.addInputRange(hInputVolume.empty(),{
@@ -688,40 +674,9 @@ function pause(){
     }
 }
 function seekTo0(){
-    g_transition.quit();
-    makeTransition();
     switch(whichVideo){
         case YouTube: return g_yt.seekTo(g_start);
         case Nico: return postNico({ eventName: "seek", data: { time: g_start * 1000 } });
         case SoundCloud: return scWidget.seekTo(g_start * 1000);
-    }
-}
-let g_transition;
-function makeTransition(){
-    g_transition = new TransitionOfSoundVolume(inputSecTransition());
-}
-class TransitionOfSoundVolume {
-    constructor(sec){
-        this.sec = sec * 1000;
-        if(!sec) return;
-        this.elm = hInputVolume.find("input").attr("disabled", true);
-        this.max = this.elm.val();
-        this.setValue = v => this.elm.val(v).trigger("change");
-        this.setValue(0);
-        this.unit = 100;
-        this.id = setInterval(()=>this.main(), this.unit);
-        this.count = 0;
-        this.key = getInputVolumeKey();
-    }
-    main(){
-        const loopNum = this.sec / this.unit;
-        if(loopNum <= this.count) return this.quit();
-        this.setValue(this.max / loopNum * (++this.count));
-    }
-    quit(){
-        if(!this.sec) return;
-        this.elm.attr("disabled", false);
-        clearInterval(this.id);
-        rpgen3.save(this.key, this.max.toString());
     }
 }
