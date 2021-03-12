@@ -327,7 +327,7 @@ function analyzeCmd(s){
     return {
         start: Number(start),
         end: Number(end),
-        rate: rate
+        rate: rate || 100
     };
 }
 function judgeURL(str){
