@@ -315,6 +315,7 @@ function analyzeCmd(s){
         rate = Number(rate[1]);
         if(rate > 100) rate = 100;
     }
+    else rate = 100;
     if(!start && !end){
         const m = s.match(new RegExp(num + ' ' + num));
         [ start, end ] = m ? m[0].split(' ') : [ 0, 0 ];
@@ -327,7 +328,7 @@ function analyzeCmd(s){
     return {
         start: Number(start),
         end: Number(end),
-        rate: rate || 100
+        rate: rate
     };
 }
 function judgeURL(str){
