@@ -652,9 +652,9 @@ function makeInputVolume(){
         title: ttl,
         save: ttl,
         min: 0,
-        max: 1,
-        value: 0.5,
-        step: 0.01,
+        max: 100,
+        value: 50,
+        step: 1,
         change: setVolume
     });
 }
@@ -663,9 +663,9 @@ function setVolume(){
     const d = b => hInputVolume.find("input").attr("disabled", b),
           v = g_cmd.volume !== null ? (d(true), g_cmd.volume) : (d(false), inputVolume());
     switch(whichVideo){
-        case YouTube: return g_yt.setVolume(v * 100);
-        case Nico: return postNico({eventName: 'volumeChange', data: { volume: v } });
-        case SoundCloud: return scWidget.setVolume(v * 100);
+        case YouTube: return g_yt.setVolume(v);
+        case Nico: return postNico({eventName: 'volumeChange', data: { volume: v/100 } });
+        case SoundCloud: return scWidget.setVolume(v);
     }
 }
 function play(){
