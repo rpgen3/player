@@ -25,9 +25,11 @@ window.paramInputURL = {
 SoundCloudは埋め込みURLじゃないと使えないので注意。
 YouTubeとSoundCloudはplaylistも可。
 YouTubeチャンネルのURLも可。
-start [秒] end [秒]をURLの隣に書くと
-曲の開始と終了地点を設定できる。
-[秒] [秒]の省略形も可。`,
+★コマンドについて
+URLの隣に書くとこれらのコマンドが発動します。
+start [秒] end [秒] … 曲の開始と終了地点を設定できる。
+[秒] [秒]の省略形も可。
+volume [0~100] … 音量を強制的に変更する。`,
 };
 $.get("sample.txt", r => {
     window.inputURL = rpgen3.addInputText("#hideArea",Object.assign({
@@ -318,8 +320,7 @@ function analyzeCmd(s){
     else volume = null;
     if(!start && !end){
         const m = s.match(new RegExp(num + ' ' + num));
-        if(!m) return false;
-        [ start, end ] = m[0].split(' ');
+        [ start, end ] = m ? m[0].split(' ') : [ 0, 0 ];
     }
     else {
         start = start ? start[1] : 0;
