@@ -635,6 +635,19 @@ function playSoundCloud(id, range){
     onResize(iframes[SoundCloud].find("iframe"));
     showVideo(SoundCloud);
 }
+const inputSecTransition = rpgen3.addSelect(h,{
+    title: "遷移時の音量調整",
+    save: "遷移時の音量調整",
+    list: {
+        "0秒": 0,
+        "1秒": 1,
+        "2秒": 2,
+        "3秒": 3,
+        "4秒": 4,
+        "5秒": 5,
+    },
+    value: 3,
+});
 let inputVolume;
 const getInputVolumeKey = () => videoName[whichVideo] + "の音量";
 function makeInputVolume(){
@@ -681,18 +694,6 @@ function seekTo0(){
         case SoundCloud: return scWidget.seekTo(g_start * 1000);
     }
 }
-const inputSecTransition = rpgen3.addSelect(h,{
-    title: "遷移時音量調整",
-    list: {
-        "0秒": 0,
-        "1秒": 1,
-        "2秒": 2,
-        "3秒": 3,
-        "4秒": 4,
-        "5秒": 5,
-    },
-    value: 3,
-});
 let g_transition;
 function makeTransition(){
     g_transition = new TransitionOfSoundVolume(inputSecTransition());
