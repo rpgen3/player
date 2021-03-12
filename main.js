@@ -313,9 +313,9 @@ function analyzeCmd(s){
         end = s.match(new RegExp('end ?' + num)),
         volume = s.match(new RegExp('volume ?' + num));
     if(volume){
-        const n = Number(volume[1]);
-        if(n < 0) volume = 0;
-        else if(n > 100) volume = 100;
+        volume = Number(volume[1]);
+        if(volume < 0) volume = 0;
+        else if(volume > 100) volume = 100;
     }
     else volume = null;
     if(!start && !end){
