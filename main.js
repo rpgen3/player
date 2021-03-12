@@ -523,7 +523,7 @@ function playFirstYouTube(id, resolve){
             onStateChange: e => {
                 switch(e.target.getPlayerState()){
                     case YT.PlayerState.PLAYING:
-                        setVolume();
+                        makeTransition();
                         endedFlag = false;
                         break;
                     case YT.PlayerState.ENDED: return playerEnded(YouTube);
@@ -577,7 +577,7 @@ window.addEventListener('message', e => {
         case 'playerStatusChange': {
             switch(data.playerStatus){
                 case 2:
-                    setVolume();
+                    makeTransition();
                     endedFlag = false;
                     break;
                 case 4: return playerEnded(Nico);
@@ -619,7 +619,7 @@ function playSoundCloud(id, range){
         show_teaser: false,
         visual: true,
         callback: () => {
-            setVolume();
+            makeTransition();
             endedFlag = false;
             play();
             scWidget.seekTo(range.start * 1000);
@@ -636,8 +636,10 @@ function playSoundCloud(id, range){
     showVideo(SoundCloud);
 }
 let inputVolume;
+const getInputVolumeKey = () => videoName[whichVideo] + "の音量";
 function makeInputVolume(){
-    const ttl = videoName[whichVideo] + "の音量";
+    if(g_transition) g_transition.quit();
+    const ttl = getInputVolumeKey();
     inputVolume = null;
     inputVolume = rpgen3.addInputRange(hInputVolume.empty(),{
         title: ttl,
@@ -677,5 +679,46 @@ function seekTo0(){
         case YouTube: return g_yt.seekTo(g_start);
         case Nico: return postNico({ eventName: "seek", data: { time: g_start * 1000 } });
         case SoundCloud: return scWidget.seekTo(g_start * 1000);
+    }
+}
+const inputSecTransition = rpgen3.addSelect(h,{
+    title: "遷移時音量調整",
+    list: {
+        "0秒": 0,
+        "1秒": 1,
+        "2秒": 2,
+        "3秒": 3,
+        "4秒": 4,
+        "5秒": 5,
+    },
+    value: 3,
+});
+let g_transition;
+function makeTransition(){
+    g_transition = new TransitionOfSoundVolume(inputSecTransition());
+}
+class TransitionOfSoundVolume {
+    constructor(sec){
+        this.sec = sec * 1000;
+        this.elm = hInputVolume.find("input").attr("disabled", true);
+        this.max = this.elm.val();
+        this.elm.val(0);
+        this.unit = 100;
+        this.id = setInterval(()=>this.main(), this.unit);
+        this.count = 0;
+        this.key = getInputVolumeKey();
+    }
+    setValue(v){
+        this.elm.val(v).trigger("change");
+    }
+    main(){
+        const loopNum = this.sec / this.unit;
+        if(loopNum <= this.count) return this.quit();
+        this.setValue(this.max / loopNum * (++this.count));
+    }
+    quit(){
+        this.elm.attr("disabled", false);
+        clearInterval(this.id);
+        rpgen3.save(this.key, this.max.toString());
     }
 }
