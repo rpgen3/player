@@ -580,7 +580,9 @@ window.addEventListener('message', e => {
     const { data } = e.data;
     switch (e.data.eventName) {
         case 'playerMetadataChange': {
-            if(g_cmd.end && g_cmd.end * 1000 < data.currentTime) playerEnded(Nico);
+            const now = data.currentTime;
+            if(!now) return;
+            if(g_cmd.end && g_cmd.end * 1000 < now) playerEnded(Nico);
             break;
         }
         case 'playerStatusChange': {
