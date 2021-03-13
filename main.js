@@ -311,7 +311,7 @@ function analyzeCmd(s){
           mStart = s.match(new RegExp('start ?' + num)),
           mEnd = s.match(new RegExp('end ?' + num)),
           mRate = s.match(new RegExp('rate ?' + num)),
-          ss = [s, mStart, mEnd, mRate].filter(v=>v).reduce((a, v) => a.replace(v[0],''));
+          ss = [s, mStart, mEnd, mRate].filter(v=>v!==null).reduce((a, v) => a.replace(v[0],''));
     let start, end, rate;
     if(mRate){
         rate = Number(mRate[1]);
