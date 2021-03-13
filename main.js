@@ -311,8 +311,7 @@ function analyzeCmd(s){
     let start = s.match(new RegExp('start ?' + num)),
         end = s.match(new RegExp('end ?' + num)),
         rate = s.match(new RegExp('rate ?' + num)),
-        ss = s;
-    [start, end, rate].filter(v=>v).forEach(v=>(ss = ss.replace(v[0],'')));
+        ss = [s, start, end, rate].filter(v=>v).reduce((a, v) => a.replace(v[0],''));
     if(rate){
         rate = Number(rate[1]);
         if(rate > 100) rate = 100;
