@@ -310,8 +310,8 @@ function analyzeCmd(s){
     const num = "([0-9]+(\\.[0-9]+)?)";
     let start = s.match(new RegExp('start ?' + num)),
         end = s.match(new RegExp('end ?' + num)),
-        rate = s.match(new RegExp('rate ?' + num)),
-        ss = [s, start, end, rate].filter(v=>v).reduce((a, v) => a.replace(v[0],''));
+        rate = s.match(new RegExp('rate ?' + num));
+    const ss = [s, start, end, rate].filter(v=>v).reduce((a, v) => a.replace(v[0],''));
     if(rate){
         rate = Number(rate[1]);
         if(rate > 100) rate = 100;
