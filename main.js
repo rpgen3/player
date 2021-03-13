@@ -310,14 +310,16 @@ function analyzeCmd(s){
     const num = "([0-9]+(\\.[0-9]+)?)";
     let start = s.match(new RegExp('start ?' + num)),
         end = s.match(new RegExp('end ?' + num)),
-        rate = s.match(new RegExp('rate ?' + num));
+        rate = s.match(new RegExp('rate ?' + num)),
+        ss = s;
+    [start, end, rate].filter(v=>v).forEach(v=>(ss = ss.replace(v[0],'')));
     if(rate){
         rate = Number(rate[1]);
         if(rate > 100) rate = 100;
     }
     else rate = 100;
     if(!start && !end){
-        const m = s.match(new RegExp(num + ' ' + num));
+        const m = ss.match(new RegExp(num + ' ' + num));
         [ start, end ] = m ? m[0].split(' ') : [ 0, 0 ];
     }
     else {
