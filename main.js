@@ -566,11 +566,9 @@ function setNico(id, start = 0){
 function playFirstNico(id, resolve){
     setNico(id).on("load", resolve);
 }
-let endNico;
 function playNico(id){
     onResize(setNico(id, g_cmd.start).on("load",play));
     showVideo(Nico);
-    endNico = g_cmd.end;
 }
 function postNico(r) {
     iframes[Nico].find("iframe").get(0).contentWindow.postMessage(Object.assign({
@@ -582,7 +580,7 @@ window.addEventListener('message', e => {
     const { data } = e.data;
     switch (e.data.eventName) {
         case 'playerMetadataChange': {
-            if(endNico && endNico * 1000 < data.currentTime) playerEnded(Nico);
+            if(g_cmd.end && g_cmd.end * 1000 < data.currentTime) playerEnded(Nico);
             break;
         }
         case 'playerStatusChange': {
