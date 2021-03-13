@@ -307,28 +307,31 @@ function getPlaylistSC(resolve, id){
     });
 }
 function analyzeCmd(s){
-    const num = "([0-9]+(\\.[0-9]+)?)";
-    let start = s.match(new RegExp('start ?' + num)),
-        end = s.match(new RegExp('end ?' + num)),
-        rate = s.match(new RegExp('rate ?' + num));
-    const ss = [s, start, end, rate].filter(v=>v).reduce((a, v) => a.replace(v[0],''));
-    if(rate){
-        rate = Number(rate[1]);
+    const num = "([0-9]+(\\.[0-9]+)?)",
+          mStart = s.match(new RegExp('start ?' + num)),
+          mEnd = s.match(new RegExp('end ?' + num)),
+          mRate = s.match(new RegExp('rate ?' + num)),
+          ss = [s, mStart, mEnd, mRate].filter(v=>v).reduce((a, v) => a.replace(v[0],''));
+    let start, end, rate;
+    if(mRate){
+        rate = Number(mRate[1]);
         if(rate > 100) rate = 100;
     }
     else rate = 100;
-    if(!start && !end){
+    if(!mStart && !mEnd){
         const m = ss.match(new RegExp(num + ' ' + num));
         [ start, end ] = m ? m[0].split(' ') : [ 0, 0 ];
     }
     else {
-        start = start ? start[1] : 0;
-        end = end ? end[1] : 0;
+        start = mStart ? mStart[1] : 0;
+        end = mEnd ? mEnd[1] : 0;
     }
+    start = Number(start);
+    end = Number(end);
     if(end <= start) end = 0;
     return {
-        start: Number(start),
-        end: Number(end),
+        start: start,
+        end: end,
         rate: rate
     };
 }
