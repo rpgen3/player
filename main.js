@@ -1,5 +1,4 @@
-const rpgen3 = window.rpgen3,
-      $ = window.$;
+const { $, rpgen3 } = window;
 const YouTube = 0,
       Nico = 1,
       SoundCloud = 2;
