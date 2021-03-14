@@ -31,6 +31,7 @@ start [秒] end [秒] … 開始と終了地点を設定。[秒] [秒]の省略�
 rate [%] … 音量に補正をかける。0～100%までの範囲のみ有効。`,
 };
 $.get("sample.txt", r => {
+    if(window.inputURL) return;
     window.inputURL = rpgen3.addInputText("#hideArea",Object.assign({
         save:  "動画URLリスト入力欄",
         value: r
