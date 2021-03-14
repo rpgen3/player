@@ -25,22 +25,27 @@
           });
     const output = $("<div>").appendTo(h),
           p = rpgen3.getParam(),
-          disabled = b => $("#loadBtn").attr("disabled", b);
+          disabled = b => $("#loadBtn").attr("disabled", b),
+          time = 1000;
     if(p.user) {
         disabled(true);
-        $.ajax({ url: `user/${p.user}.txt` })
-            .done(d=>makeNewInputURL(d))
-            .fail(()=>msg("共有データの読み込みに失敗しました。", true))
-            .always(()=>disabled(false));
+        setTimeout(()=>{
+            $.ajax({ url: `user/${p.user}.txt` })
+                .done(d=>makeNewInputURL(d))
+                .fail(()=>msg("共有データの読み込みに失敗しました。", true))
+                .always(()=>disabled(false));
+        }, time);
     }
     else if(p.imgur){
         disabled(true);
-        imgur.load(p.imgur).then(img => {
-            makeNewInputURL(imgToStr(img));
-            if(p.dhash && p.token) makeDeleteBtn(p.dhash, p.token);
-        })
-            .catch(()=>msg("共有データの読み込みに失敗しました。", true))
-            .finally(()=>disabled(false));
+        setTimeout(()=>{
+            imgur.load(p.imgur).then(img => {
+                makeNewInputURL(imgToStr(img));
+                if(p.dhash && p.token) makeDeleteBtn(p.dhash, p.token);
+            })
+                .catch(()=>msg("共有データの読み込みに失敗しました。", true))
+                .finally(()=>disabled(false));
+        }, time);
     }
     function makeDeleteBtn(dhash, token){
         btn.hide();
