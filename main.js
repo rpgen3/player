@@ -60,7 +60,7 @@ const selectSaveDataType = rpgen3.addSelect("#conf",{
         "動画情報": "videoInfo"
     }
 });
-$("<button>").appendTo("#conf").text("削除").on("click",()=>{
+$("<button>").appendTo("#conf").text("選択したキャッシュを削除").on("click",()=>{
     if(!confirm("キャッシュを削除しますか？")) return;
     rpgen3.makeArray(3).map(v=>videoName[v]).forEach(videoType=>{
         rpgen3.getSaveKeys().filter(v=>(new RegExp(`^${selectSaveDataType()}#${videoType}#`)).test(v)).forEach(v=>{
@@ -68,7 +68,7 @@ $("<button>").appendTo("#conf").text("削除").on("click",()=>{
         });
     });
 });
-$("<a>").appendTo("#conf").text("補足説明").attr({
+$("<a>").appendTo($("<div>").appendTo("#conf")).text("補足説明").attr({
     href: "https://rpgen3.github.io/player/sub/index.html",
     target: "_blank",
 });
