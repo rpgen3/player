@@ -53,10 +53,17 @@ const showInfoOfYouTubeFlag = rpgen3.addInputBool("#conf",{
     save: "YouTubeの動画情報も取得する",
 });
 const makeKeyOfPlaylist = (videoType, id) => `playlist#${videoName[videoType]}#${id}`;
-$("<button>").appendTo("#conf").text("playlistのキャッシュをクリア").on("click",()=>{
-    if(!confirm("playlistのキャッシュを削除しますか？")) return;
+const selectSaveDataType = rpgen3.addSelect("#conf",{
+    title: "キャッシュ",
+    list: {
+        "プレイリスト": "playlist",
+        "動画情報": "videoInfo"
+    }
+});
+$("<button>").appendTo("#conf").text("削除").on("click",()=>{
+    if(!confirm("キャッシュを削除しますか？")) return;
     rpgen3.makeArray(3).map(v=>videoName[v]).forEach(videoType=>{
-        rpgen3.getSaveKeys().filter(v=>(new RegExp(`^playlist#${videoType}#`)).test(v)).forEach(v=>{
+        rpgen3.getSaveKeys().filter(v=>(new RegExp(`^${selectSaveDataType()}#${videoType}#`)).test(v)).forEach(v=>{
             rpgen3.removeSaveData(v);
         });
     });
@@ -224,14 +231,28 @@ function loadItem({timeStamp,v,i,id,cover,funcList,h}){
         }
     }).then(elm=>{
         if(g_timeStamp !== timeStamp) return;
-        elm.prependTo(h).on("load",()=>{
+        new Promise((resolve, reject)=>{
+            elm.prependTo(h).on("load",resolve).on("error",reject).css({
+                maxHeight: 100,
+            });
+        })
+            .catch(()=>{
+            elm.remove();
+            elm = $("<div>").prependTo(h).text("画像読み込み失敗").css({
+                color: "red",
+                backgroundColor: "pink",
+                height: 100,
+                width: 100,
+                display: "table-cell",
+                "vertical-align": "middle"
+            });
+        })
+            .finally(()=>{
             if(g_timeStamp !== timeStamp) return;
             onLoadFunc({i,id,cover,elm,h});
             hHideArea.empty();
             const next = i + 1;
             if(next < funcList.length) setTimeout(()=>funcList[next](),60/130*1000);
-        }).css({
-            maxHeight: 100,
         });
     }).catch(err=>msg(err,true));
 }
