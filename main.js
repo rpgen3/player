@@ -533,12 +533,14 @@ let endedFlag = false;
 const playerEnded = videoType => {
     if(videoType !== whichVideo) return;
     if(endedFlag) return;
-    endedFlag = true;
     if(repeatPlayFlag()){
         seekTo0();
         play();
     }
-    else next();
+    else {
+        endedFlag = true;
+        next();
+    }
 }
 let g_yt;
 function playFirstYouTube(id, resolve){
