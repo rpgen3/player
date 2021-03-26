@@ -26,9 +26,9 @@
     const output = $("<div>").appendTo(h),
           p = rpgen3.getParam(),
           disabled = b => $("#loadBtn").attr("disabled", b);
-    if(p.user) {
+    if(p.mylist) {
         disabled(true);
-        $.ajax({ url: `user/${p.user}.txt` })
+        $.ajax({ url: `mylist/${p.mylist}.txt` })
             .done(d=>makeNewInputURL(d))
             .fail(()=>msg("共有データの読み込みに失敗しました。", true))
             .always(()=>disabled(false));
