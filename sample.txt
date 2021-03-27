@@ -1,3 +1,5 @@
+入力の例
+
 YouTube
 https://www.youtube.com/watch?v=aC3672z9FOY
 https://www.youtube.com/watch?v=5eFOdOadzP4
