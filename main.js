@@ -380,11 +380,13 @@ function judgeURL(str){
             // if(p.search_query) return resolve => getPlaylistYT(resolve, 'search', p.search_query);
             if(!m) m = url.match(/[\?&]v=([A-Za-z0-9_\-]+)/);
             if(m) return [ YouTube, m[1], cmd ];
+            break;
         case "nicovideo.jp":
         case "nico.ms":
             if(!(isAllowedToLoad[Nico]())) return;
             m = url.match(/sm([0-9]+)/);
             if(m) return [ Nico, m[1], cmd ];
+            break;
         case "soundcloud.com":
             if(!(isAllowedToLoad[SoundCloud]())) return;
             if(/playlists/.test(url)) {
@@ -393,6 +395,7 @@ function judgeURL(str){
             }
             m = url.match(/\/tracks\/([0-9]+)/);
             if(m) return [ SoundCloud, m[1], cmd ];
+            break;
     }
     return console.error("this url is not supported\n" + url);
 }
