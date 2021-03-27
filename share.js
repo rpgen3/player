@@ -29,7 +29,10 @@
     if(p.mylist) {
         disabled(true);
         $.ajax({ url: `mylist/${p.mylist}.txt` })
-            .done(d=>makeNewInputURL(d))
+            .done(d=>{
+            makeNewInputURL(d);
+            changePageTtl(p.mylist, "sleepy");
+        })
             .fail(()=>msg("共有データの読み込みに失敗しました。", true))
             .always(()=>disabled(false));
     }
@@ -38,6 +41,7 @@
         imgur.load(p.imgur).then(img => {
             makeNewInputURL(imgToStr(img));
             if(p.dhash && p.token) makeDeleteBtn(p.dhash, p.token);
+            changePageTtl(p.imgur, "yunomi");
         })
             .catch(()=>msg("共有データの読み込みに失敗しました。", true))
             .finally(()=>disabled(false));
@@ -61,5 +65,9 @@
         window.inputURL = rpgen3.addInputText("#hideArea", Object.assign({
             value: value
         }, window.paramInputURL));
+    }
+    function changePageTtl(ttl, img){
+        $("title").text(ttl);
+        $('link[rel="icon"]').attr("href",`https://rpgen3.github.io/player/icon/${img}.png`);
     }
 })();
