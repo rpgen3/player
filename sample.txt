@@ -13,7 +13,7 @@ https://api.soundcloud.com/tracks/348170735
 https://api.soundcloud.com/tracks/446541525
 
 YouTube(プレイリスト)
-https://www.youtube.com/playlist?list=PLyNig3hGyz002Za3LThizAdMwEX5uKzVE
+https://www.youtube.com/playlist?list=PLdt5gxSJI6f3YkYWFyCi8FPFle7pVF--f
 
 SoundCloud(プレイリスト)
 https://api.soundcloud.com/playlists/1112169349
