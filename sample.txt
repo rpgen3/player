@@ -1,8 +1,8 @@
 入力例
 
 YouTube
-https://www.youtube.com/watch?v=aC3672z9FOY
-https://www.youtube.com/watch?v=5eFOdOadzP4
+https://www.youtube.com/watch?v=2P2TC8Tlq7M
+https://www.youtube.com/watch?v=nCM_EToIh7A
 
 ニコニコ動画
 https://www.nicovideo.jp/watch/sm25036949
