@@ -530,8 +530,7 @@ const hIframe = $("<div>").appendTo(h),
           $("<div>").appendTo(hIframe).hide(),
           $("<div>").appendTo(hIframe).hide().append("<iframe>"),
           $("<div>").appendTo(hIframe).hide().append("<iframe>"),
-      ],
-      isSmartPhone = /iPhone|Android.+Mobile/.test(navigator.userAgent);
+      ];
 let endedFlag = false;
 const playerEnded = videoType => {
     if(videoType !== whichVideo) return;
@@ -553,10 +552,7 @@ function playFirstYouTube(id, resolve){
             playsinline: 1,
         },
         events: {
-            onReady: e => {
-                if(isSmartPhone) e.target.mute();
-                resolve();
-            },
+            onReady: resolve,
             onStateChange: e => {
                 switch(e.target.getPlayerState()){
                     case YT.PlayerState.PLAYING:
