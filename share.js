@@ -5,7 +5,7 @@
               const input = window.inputURL();
               if(!rpgen3.makeArrayURL(input).length) return alert("共有する内容がありません。");
               btn.attr("disabled", true);
-              imgur.upload(strToImg(input)).then(({ id, dhash, token })=>{
+              imgur.upload(rpgen3.strToImg(input)).then(({ id, dhash, token })=>{
                   makeDeleteBtn(dhash, token);
                   const url = `https://rpgen3.github.io/player/?imgur=${id}`;
                   rpgen3.addInputText(output,{
@@ -39,7 +39,7 @@
     else if(p.imgur){
         disabled(true);
         imgur.load(p.imgur).then(img => {
-            makeNewInputURL(imgToStr(img));
+            makeNewInputURL(rpgen3.imgToStr(img));
             if(p.dhash && p.token) makeDeleteBtn(p.dhash, p.token);
             changePageTtl(p.imgur, "yunomi");
         })
