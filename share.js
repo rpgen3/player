@@ -3,7 +3,7 @@
           h = $("<div>").prependTo("#hideArea"),
           btn = $("<button>").appendTo(h).text("共有").on("click",()=>{
               const input = window.inputURL();
-              if(!rpgen3.makeArrayURL(input).length) return alert("共有する内容がありません。");
+              if(!rpgen3.findURL(input).length) return alert("共有する内容がありません。");
               btn.attr("disabled", true);
               imgur.upload(rpgen3.strToImg(input)).then(({ id, dhash, token })=>{
                   makeDeleteBtn(dhash, token);
