@@ -62,7 +62,7 @@ const selectSaveDataType = rpgen3.addSelect("#conf",{
 });
 $("<button>").appendTo("#conf").text("選択したキャッシュを削除").on("click",()=>{
     if(!confirm("キャッシュを削除しますか？")) return;
-    rpgen3.makeArray(3).map(v=>videoName[v]).forEach(videoType=>{
+    new Array(3).fill().map((v,i)=>videoName[i]).forEach(videoType=>{
         rpgen3.getSaveKeys().filter(v=>(new RegExp(`^${selectSaveDataType()}#${videoType}#`)).test(v)).forEach(v=>{
             rpgen3.removeSaveData(v);
         });
@@ -422,7 +422,7 @@ $("<button>").appendTo(h).text("最初から").on("click",seekTo0);
 const hInputVolume = $("<div>").appendTo(h);
 class Unplayed {
     constructor(){
-        this.ar = rpgen3.makeArray(g_list.length);
+        this.ar = new Array(g_list.length).fill().map((v,i)=>i);
     }
     exclude(i){
         if(!this.ar.length) return false;
