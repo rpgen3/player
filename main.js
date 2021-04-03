@@ -357,7 +357,7 @@ function analyzeCmd(s){
     };
 }
 function judgeURL(str){
-    const url = rpgen3.makeArrayURL(str)[0];
+    const url = rpgen3.findURL(str)[0];
     if(!url) return;
     const cmd = analyzeCmd(str.replace(url,'')),
           d = rpgen3.getDomain(url).reverse(),
