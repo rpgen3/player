@@ -37,5 +37,9 @@ https://api.soundcloud.com/tracks/835868335
 https://api.soundcloud.com/tracks/833536780
 https://api.soundcloud.com/tracks/833528365
 
+Ayase
+https://api.soundcloud.com/tracks/722097112
+
 初音ミク
-https://api.soundcloud.com/tracks/422203890
+https://api.soundcloud.com/tracks/482641728
+https://api.soundcloud.com/tracks/372423353
