@@ -5,8 +5,8 @@
               const input = window.inputURL();
               if(!rpgen3.findURL(input).length) return alert("共有する内容がありません。");
               btn.attr("disabled", true);
-              imgur.upload(strToImg(input)).then(({ id, dhash, token })=>{
-                  makeDeleteBtn(dhash, token);
+              imgur.upload(strToImg(input)).then(({ id, deletehash, token })=>{
+                  makeDeleteBtn(deletehash, token);
                   const url = `https://rpgen3.github.io/player/?imgur=${id}`;
                   rpgen3.addInputText(output,{
                       readonly: true,
@@ -16,7 +16,7 @@
                   rpgen3.addInputText(output,{
                       readonly: true,
                       title: "削除用URL",
-                      value: url + `&dhash=${dhash}&token=${token}`
+                      value: url + `&deletehash=${deletehash}&token=${token}`
                   });
               }).catch(()=>{
                   alert("アップロードできませんでした。");
@@ -40,17 +40,17 @@
         disabled(true);
         imgur.load(p.imgur).then(img => {
             makeNewInputURL(imgToStr(img));
-            if(p.dhash && p.token) makeDeleteBtn(p.dhash, p.token);
+            if(p.deletehash && p.token) makeDeleteBtn(p.deletehash, p.token);
             changePageTtl(p.imgur, "yunomi");
         })
             .catch(()=>msg("共有データの読み込みに失敗しました。", true))
             .finally(()=>disabled(false));
     }
-    function makeDeleteBtn(dhash, token){
+    function makeDeleteBtn(deletehash, token){
         btn.hide();
         const btn2 = $("<button>").appendTo(output).text("共有停止").on("click", () => {
             btn2.attr("disabled", true);
-            imgur.delete({ dhash, token }).then(()=>{
+            imgur.delete({ deletehash, token }).then(()=>{
                 alert("削除しました。");
                 output.empty();
                 btn.attr("disabled", false).show();
