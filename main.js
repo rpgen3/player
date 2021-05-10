@@ -25,9 +25,11 @@ SoundCloudは埋め込みURLじゃないと使えないので注意。
 YouTubeとSoundCloudはplaylistも可。
 YouTubeチャンネルのURLも可。
 ★コマンドについて
-URLの隣に書くとこれらのコマンドが発動します。
+・URLの隣に書くとこれらのコマンドが発動します。
 start [秒] end [秒] … 開始と終了地点を設定。[秒] [秒]の省略形も可。
-rate [%] … 音量に補正をかける。0～100%までの範囲のみ有効。`,
+rate [%] … 音量に補正をかける。0～100%までの範囲のみ有効。
+・URLの隣では無い場所に書いて発動するコマンドもあります。
+max-rate [%] … rateで設定できる最大値を設定。100%以上の値のみ有効`,
 };
 $.get("sample.txt", r => {
     if(window.inputURL) return;
@@ -90,6 +92,7 @@ function loadList(){
     const timeStamp = +new Date;
     g_timeStamp = timeStamp;
     msg("Now Loading...");
+    initCmd2();
     Promise.all(window.inputURL().split('\n').map(url=>{
         return new Promise((resolve, reject)=>{
             const r = judgeURL(url);
@@ -336,7 +339,7 @@ function analyzeCmd(s){
     let start, end, rate;
     if(mRate){
         rate = Number(mRate[1]);
-        if(rate > 100) rate = 100;
+        if(rate > g_maxRate) rate = g_maxRate;
     }
     else rate = 100;
     if(!mStart && !mEnd){
@@ -356,9 +359,24 @@ function analyzeCmd(s){
         rate: rate
     };
 }
+let g_maxRate;
+function initCmd2(){
+    g_maxRate = 100;
+}
+function analyzeCmd2(s){
+    const num = "([0-9]+(\\.[0-9]+)?)",
+          mRate = s.match(new RegExp('max-rate ?' + num));
+    if(![mRate].some(v=>v)) return;
+    let maxRate;
+    if(mRate){
+        maxRate = Number(mRate[1]);
+        if(maxRate < 100) maxRate = 100;
+    }
+    g_maxRate = maxRate;
+}
 function judgeURL(str){
     const url = rpgen3.findURL(str)[0];
-    if(!url) return;
+    if(!url) return analyzeCmd2(str);
     const cmd = analyzeCmd(str.replace(url,'')),
           d = rpgen3.getDomain(url).reverse(),
           p = rpgen3.getParam(url);
@@ -672,7 +690,9 @@ let inputVolume;
 function makeInputVolume(){
     const ttl = videoName[whichVideo] + "の音量";
     inputVolume = rpgen3.addInputRange(hInputVolume.empty(),{
-        title: ttl + (g_cmd.rate !== 100 ? `(${g_cmd.rate}%)` : ''),
+        title: ttl
+        + (g_cmd.rate !== 100 ? `(${g_cmd.rate}%)` : '')
+        + (g_maxRate !== 100 ? `※最大${g_maxRate}%` : ''),
         save: ttl,
         min: 0,
         max: 100,
@@ -683,7 +703,7 @@ function makeInputVolume(){
 }
 function setVolume(){
     if(!inputVolume) return;
-    const v = inputVolume() * g_cmd.rate/100;
+    const v = inputVolume() * g_cmd.rate/g_maxRate;
     switch(whichVideo){
         case YouTube: return g_yt.setVolume(v);
         case Nico: return postNico({eventName: 'volumeChange', data: { volume: v/100 } });
