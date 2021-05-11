@@ -336,12 +336,7 @@ function analyzeCmd(s){
           mEnd = s.match(new RegExp('end ?' + num)),
           mRate = s.match(new RegExp('rate ?' + num)),
           ss = [s, ...[mStart, mEnd, mRate].filter(v=>v)].reduce((a, v)=>a.replace(v[0],''));
-    let start, end, rate;
-    if(mRate){
-        rate = Number(mRate[1]);
-        if(rate > g_maxRate) rate = g_maxRate;
-    }
-    else rate = 100;
+    let start, end, rate = mRate ? Number(mRate[1]) : 100;
     if(!mStart && !mEnd){
         const m = ss.match(new RegExp(num + ' ' + num));
         [ start, end ] = m ? m[0].split(' ') : [ 0, 0 ];
@@ -494,6 +489,7 @@ function start(id){
         end: 0,
         rate: 100
     }, r[2]);
+    if(g_cmd.rate > g_maxRate) g_cmd.rate = g_maxRate;
     (()=>{
         switch(r[0]){
             case YouTube: return playYouTube;
@@ -690,9 +686,7 @@ let inputVolume;
 function makeInputVolume(){
     const ttl = videoName[whichVideo] + "の音量";
     inputVolume = rpgen3.addInputRange(hInputVolume.empty(),{
-        title: ttl
-        + (g_cmd.rate !== 100 ? `(${g_cmd.rate}%)` : '')
-        + (g_maxRate !== 100 ? `※最大${g_maxRate}%` : ''),
+        title: ttl + (g_cmd.rate !== 100 ? `(${g_cmd.rate}%)` : ''),
         save: ttl,
         min: 0,
         max: 100,
