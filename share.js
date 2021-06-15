@@ -68,6 +68,6 @@
     }
     function changePageTtl(ttl, img){
         $("title").text(ttl);
-        $('link[rel="icon"]').attr("href",`https://rpgen3.github.io/player/icon/${img}.png`);
+        $('link[rel="icon"]').attr("href",`icon/${img}.png`);
     }
 })();
