@@ -31,6 +31,9 @@ https://api.soundcloud.com/tracks/919591105
 https://api.soundcloud.com/tracks/919591138
 https://api.soundcloud.com/tracks/919591000
 
+妖々夢
+https://api.soundcloud.com/tracks/918966079
+
 紅魔郷
 https://api.soundcloud.com/tracks/918909607
 https://api.soundcloud.com/tracks/918909598
