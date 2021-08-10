@@ -8,6 +8,7 @@ https://api.soundcloud.com/tracks/925841236
 
 紺珠伝
 https://api.soundcloud.com/tracks/925491577
+https://api.soundcloud.com/tracks/925491517
 
 輝針城
 https://api.soundcloud.com/tracks/925345636
