@@ -16,10 +16,15 @@ https://api.soundcloud.com/tracks/925345636
 神霊廟
 https://api.soundcloud.com/tracks/925331932
 
+緋想天
+https://api.soundcloud.com/tracks/924931996
+https://api.soundcloud.com/tracks/924931972
+
 地霊殿
 https://api.soundcloud.com/tracks/924308797
 https://api.soundcloud.com/tracks/924308605
 https://api.soundcloud.com/tracks/924308683
+https://api.soundcloud.com/tracks/924308551
 
 風神録
 https://api.soundcloud.com/tracks/922576858
@@ -32,6 +37,7 @@ https://api.soundcloud.com/tracks/921944077
 
 永夜抄
 https://api.soundcloud.com/tracks/919591549
+https://api.soundcloud.com/tracks/919591249
 https://api.soundcloud.com/tracks/919591105
 https://api.soundcloud.com/tracks/919591138
 https://api.soundcloud.com/tracks/919591000
@@ -42,7 +48,3 @@ https://api.soundcloud.com/tracks/918966079
 紅魔郷
 https://api.soundcloud.com/tracks/918909607
 https://api.soundcloud.com/tracks/918909598
-
-緋想天
-https://api.soundcloud.com/tracks/924931996
-https://api.soundcloud.com/tracks/924931972
