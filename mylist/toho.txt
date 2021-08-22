@@ -1,5 +1,13 @@
 虹龍洞
 https://api.soundcloud.com/tracks/1012427770
+https://api.soundcloud.com/tracks/1041906445
+https://api.soundcloud.com/tracks/1041907690
+
+鬼形獣
+https://api.soundcloud.com/tracks/926644837
+
+憑依華
+https://api.soundcloud.com/tracks/926638414
 
 天空璋
 https://api.soundcloud.com/tracks/925841377
@@ -7,13 +15,19 @@ https://api.soundcloud.com/tracks/925841308
 https://api.soundcloud.com/tracks/925841236
 
 紺珠伝
+https://api.soundcloud.com/tracks/925491700
 https://api.soundcloud.com/tracks/925491577
 https://api.soundcloud.com/tracks/925491517
 
+深秘録
+https://api.soundcloud.com/tracks/925361716
+
 輝針城
 https://api.soundcloud.com/tracks/925345636
+https://api.soundcloud.com/tracks/925345396
 
 神霊廟
+https://api.soundcloud.com/tracks/925332280
 https://api.soundcloud.com/tracks/925331932
 
 緋想天
@@ -28,6 +42,7 @@ https://api.soundcloud.com/tracks/924308551
 
 風神録
 https://api.soundcloud.com/tracks/922576858
+https://api.soundcloud.com/tracks/922576837
 https://api.soundcloud.com/tracks/922576789
 https://api.soundcloud.com/tracks/922576669
 https://api.soundcloud.com/tracks/922576582
@@ -35,11 +50,15 @@ https://api.soundcloud.com/tracks/922576582
 文花帖
 https://api.soundcloud.com/tracks/921944077
 
+東方萃夢想
+https://api.soundcloud.com/tracks/920993443
+
 永夜抄
 https://api.soundcloud.com/tracks/919591549
 https://api.soundcloud.com/tracks/919591249
 https://api.soundcloud.com/tracks/919591105
 https://api.soundcloud.com/tracks/919591138
+https://api.soundcloud.com/tracks/919591042
 https://api.soundcloud.com/tracks/919591000
 
 妖々夢
