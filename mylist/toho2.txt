@@ -8,3 +8,13 @@ https://api.soundcloud.com/tracks/801385996
 https://api.soundcloud.com/tracks/760508899
 https://api.soundcloud.com/tracks/812508808
 https://api.soundcloud.com/tracks/812511547
+
+千絵嘉穂理
+https://api.soundcloud.com/tracks/580157502
+https://api.soundcloud.com/tracks/579829590
+https://api.soundcloud.com/tracks/571257141
+https://api.soundcloud.com/tracks/571255911
+https://api.soundcloud.com/tracks/571219452
+https://api.soundcloud.com/tracks/569666094
+https://api.soundcloud.com/tracks/569693019
+https://api.soundcloud.com/tracks/569658726
