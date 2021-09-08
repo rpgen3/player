@@ -14,6 +14,9 @@ https://api.soundcloud.com/tracks/925841377
 https://api.soundcloud.com/tracks/925841308
 https://api.soundcloud.com/tracks/925841236
 
+燕石博物誌
+https://api.soundcloud.com/tracks/925823137
+
 紺珠伝
 https://api.soundcloud.com/tracks/925491700
 https://api.soundcloud.com/tracks/925491577
@@ -47,6 +50,9 @@ https://api.soundcloud.com/tracks/922576789
 https://api.soundcloud.com/tracks/922576669
 https://api.soundcloud.com/tracks/922576582
 
+大空魔術
+https://api.soundcloud.com/tracks/921974332
+
 文花帖
 https://api.soundcloud.com/tracks/921944077
 
@@ -62,8 +68,12 @@ https://api.soundcloud.com/tracks/919591042
 https://api.soundcloud.com/tracks/919591000
 
 妖々夢
+https://api.soundcloud.com/tracks/918965947
+https://api.soundcloud.com/tracks/918965968
 https://api.soundcloud.com/tracks/918966079
 
 紅魔郷
+https://api.soundcloud.com/tracks/918909427
 https://api.soundcloud.com/tracks/918909607
 https://api.soundcloud.com/tracks/918909598
+https://api.soundcloud.com/tracks/918909631
