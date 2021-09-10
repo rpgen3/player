@@ -57,6 +57,9 @@ https://api.soundcloud.com/tracks/921974332
 文花帖
 https://api.soundcloud.com/tracks/921944077
 
+妖精大戦争
+https://api.soundcloud.com/tracks/925338289
+
 東方萃夢想
 https://api.soundcloud.com/tracks/920993443
 
