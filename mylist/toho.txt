@@ -26,6 +26,7 @@ https://api.soundcloud.com/tracks/925491517
 https://api.soundcloud.com/tracks/925361716
 
 輝針城
+https://api.soundcloud.com/tracks/925345675
 https://api.soundcloud.com/tracks/925345636
 https://api.soundcloud.com/tracks/925345396
 
@@ -68,12 +69,13 @@ https://api.soundcloud.com/tracks/919591042
 https://api.soundcloud.com/tracks/919591000
 
 妖々夢
-https://api.soundcloud.com/tracks/918965947
-https://api.soundcloud.com/tracks/918965968
 https://api.soundcloud.com/tracks/918966079
+https://api.soundcloud.com/tracks/918965968
+https://api.soundcloud.com/tracks/918965947
 
 紅魔郷
-https://api.soundcloud.com/tracks/918909427
+https://api.soundcloud.com/tracks/918909679
+https://api.soundcloud.com/tracks/918909631
 https://api.soundcloud.com/tracks/918909607
 https://api.soundcloud.com/tracks/918909598
-https://api.soundcloud.com/tracks/918909631
+https://api.soundcloud.com/tracks/918909427
