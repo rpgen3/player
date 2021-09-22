@@ -14,10 +14,9 @@ https://api.soundcloud.com/tracks/925841377
 https://api.soundcloud.com/tracks/925841308
 https://api.soundcloud.com/tracks/925841236
 
-燕石博物誌
-https://api.soundcloud.com/tracks/925823137
-
 紺珠伝
+https://api.soundcloud.com/tracks/925491781
+https://api.soundcloud.com/tracks/925491733
 https://api.soundcloud.com/tracks/925491700
 https://api.soundcloud.com/tracks/925491577
 https://api.soundcloud.com/tracks/925491517
@@ -32,7 +31,15 @@ https://api.soundcloud.com/tracks/925345396
 
 神霊廟
 https://api.soundcloud.com/tracks/925332280
+https://api.soundcloud.com/tracks/925332244
 https://api.soundcloud.com/tracks/925331932
+
+星蓮船
+https://api.soundcloud.com/tracks/925274707
+https://api.soundcloud.com/tracks/925274650
+https://api.soundcloud.com/tracks/925274566
+https://api.soundcloud.com/tracks/925274461
+https://api.soundcloud.com/tracks/925274407
 
 緋想天
 https://api.soundcloud.com/tracks/924931996
@@ -60,12 +67,13 @@ https://api.soundcloud.com/tracks/921944077
 妖精大戦争
 https://api.soundcloud.com/tracks/925338289
 
-東方萃夢想
+萃夢想
 https://api.soundcloud.com/tracks/920993443
 
 永夜抄
 https://api.soundcloud.com/tracks/919591549
 https://api.soundcloud.com/tracks/919591249
+https://api.soundcloud.com/tracks/919591174
 https://api.soundcloud.com/tracks/919591105
 https://api.soundcloud.com/tracks/919591138
 https://api.soundcloud.com/tracks/919591042
