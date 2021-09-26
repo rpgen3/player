@@ -31,3 +31,13 @@ https://api.soundcloud.com/tracks/904847479
 
 Geolyte Meteos
 https://api.soundcloud.com/tracks/964757020
+
+Green wisteria
+https://api.soundcloud.com/tracks/1109503348
+https://api.soundcloud.com/tracks/1109497897
+https://api.soundcloud.com/tracks/957896374
+https://api.soundcloud.com/tracks/768064231
+https://api.soundcloud.com/tracks/768062236
+
+ねるあめ
+https://api.soundcloud.com/tracks/1048784320
