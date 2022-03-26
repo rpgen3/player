@@ -31,7 +31,7 @@ rate [%] … 音量に補正をかける。0～100%までの範囲のみ有効�
 ・URLの隣では無い場所に書いて発動するコマンドもあります。
 max-rate [%] … rateで設定できる最大値を設定。100%以上の値のみ有効`,
 };
-$.get("sample.txt", r => {
+$.get("https://rpgen3.github.io/player/sample.txt", r => {
     if(window.inputURL) return;
     window.inputURL = rpgen3.addInputText("#hideArea",Object.assign({
         save:  "動画URLリスト入力欄",
