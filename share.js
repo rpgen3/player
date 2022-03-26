@@ -28,7 +28,7 @@
           disabled = b => $("#loadBtn").attr("disabled", b);
     if(p.mylist) {
         disabled(true);
-        $.ajax({ url: `mylist/${p.mylist}.txt` })
+        $.ajax({ url: `https://rpgen3.github.io/player/mylist/${p.mylist}.txt` })
             .done(d=>{
             makeNewInputURL(d);
             changePageTtl(p.mylist, "sleepy");
