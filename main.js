@@ -317,7 +317,7 @@ function onLoadFunc({ i, id, cover, elm, h }) {
     })
     .longpress(
       () => highlightVideoID(id),
-      (e) => ((e.buttons&2) === 2 ? start(i) : false),
+      (e) => ((e.buttons&1) === 1 ? start(i) : false),
       1000
     );
 }
