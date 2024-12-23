@@ -639,12 +639,16 @@ function playFirstYouTube(id, resolve) {
       onReady: resolve,
       onStateChange: (e) => {
         switch (e.target.getPlayerState()) {
+          case YT.PlayerState.UNSTARTED:
+            setVolume(0);
+            break;
           case YT.PlayerState.PLAYING:
             setVolume();
             endedFlag = false;
             break;
           case YT.PlayerState.ENDED:
-            return playerEnded(YouTube);
+            playerEnded(YouTube);
+            break;
         }
       },
     },
@@ -779,12 +783,12 @@ function makeInputVolume() {
     max: 100,
     value: 50,
     step: 1,
-    change: setVolume,
+    change: () => setVolume(),
   });
 }
-function setVolume() {
+function setVolume(volume) {
   if (!inputVolume) return;
-  const v = (inputVolume() * g_cmd.rate) / g_maxRate;
+  const v = volume ?? (inputVolume() * g_cmd.rate) / g_maxRate;
   switch (whichVideo) {
     case YouTube:
       return g_yt.setVolume(v);
