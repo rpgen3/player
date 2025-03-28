@@ -251,7 +251,7 @@ function loadItem({ timeStamp, v, i, id, cover, funcList, h }) {
               $("<iframe>")
                 .appendTo(hHideArea)
                 .attr({
-                  src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}`,
+                  src: Number.isNaN(Number(id))?`https://w.soundcloud.com/player/?url=${encodeURIComponent(id)}`:`https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}`,
                 })
                 .get(0)
             );
@@ -472,7 +472,7 @@ function judgeURL(str) {
       }
       m = url.match(/\/tracks\/([0-9]+)/);
       if (m) return [SoundCloud, m[1], cmd];
-      break;
+      return [SoundCloud, url, cmd];
   }
   return console.error("this url is not supported\n" + url);
 }
@@ -743,7 +743,7 @@ function playFirstSoundCloud(id, resolve) {
         frameborder: "no",
         playsinline: 1,
         allow: "autoplay",
-        src: `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}`,
+        src: Number.isNaN(Number(id))?`https://w.soundcloud.com/player/?url=${encodeURIComponent(id)}`:`https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${id}`,
       })
       .get(0)
   );
@@ -752,7 +752,7 @@ function playFirstSoundCloud(id, resolve) {
 }
 let scID;
 function playSoundCloud(id) {
-  scWidget.load(`https://api.soundcloud.com/tracks/${id}`, {
+  scWidget.load(Number.isNaN(Number(id))?`${id}`:`https://api.soundcloud.com/tracks/${id}`, {
     auto_play: false,
     show_teaser: false,
     visual: true,
